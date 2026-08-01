@@ -11,8 +11,7 @@ import {
 import { filterRecordsByFiscalCycle } from '../services/mongoQueryHelper';
 import FiscalCycleFilter from './FiscalCycleFilter';
 import {
-  TrendingUp, TrendingDown, AlertCircle,
-  FileText, ArrowUpRight, ArrowDownRight, Layers
+  TrendingUp, TrendingDown, AlertCircle, FileText
 } from 'lucide-react';
 
 export default function Dashboard({ companyId }: { companyId: string }) {
@@ -134,35 +133,6 @@ export default function Dashboard({ companyId }: { companyId: string }) {
         showPropertySelector={true}
       />
 
-      {/* Quick Comparative Stats Banner */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-900/10 via-purple-900/10 to-sky-900/10 border border-indigo-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-sm">
-            <Layers className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="font-extrabold text-slate-800">
-              {lang === 'bn' ? 'সাইকেল সাপেক্ষে তুলনা বিবরণী (' : 'Cycle Comparison: '}
-              {fiscalState.mode === 'monthly' ? (lang === 'bn' ? 'চলতি মাস বনাম পূর্ববর্তী মাস' : 'Current Month vs Previous Month') : (lang === 'bn' ? 'চলতি কোয়ার্টার বনাম পূর্ববর্তী কোয়ার্টার' : 'Current Quarter vs Previous Quarter')}
-              )
-            </span>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              {lang === 'bn' ? `পূর্ববর্তী সাইকেলে সংগৃহীত ছিল: ৳ ${prevCollected.toLocaleString()}` : `Previous period collection: ৳ ${prevCollected.toLocaleString()}`}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 font-bold">
-          <span className={`px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-sm ${
-            collectionDiff >= 0 
-              ? 'bg-emerald-500/10 text-emerald-600  border border-emerald-500/20' 
-              : 'bg-rose-500/10 text-rose-600  border border-rose-500/20'
-          }`}>
-            {collectionDiff >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-            {Math.abs(collectionPercentChange)}% {collectionDiff >= 0 ? (lang === 'bn' ? 'বৃদ্ধি' : 'Increase') : (lang === 'bn' ? 'হ্রাস' : 'Decrease')}
-          </span>
-        </div>
-      </div>
 
       {/* 6 Core Effective Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -170,7 +140,7 @@ export default function Dashboard({ companyId }: { companyId: string }) {
         {/* Receivable Rent Card */}
         <div className="glass-panel glass-card-hover rounded-2xl p-5 border border-slate-200 flex justify-between items-center shadow-sm">
           <div className="space-y-1">
-            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">সাইকেলের প্রাপ্য ভাড়া</span>
+            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">মাসিক প্রাপ্য ভাড়া</span>
             <h3 className="text-xl font-extrabold tracking-tight text-slate-800">৳ {currentReceivable.toLocaleString()}</h3>
             <span className="text-[10px] text-sky-500 font-medium">
               {startDate} ~ {endDate}
@@ -184,7 +154,7 @@ export default function Dashboard({ companyId }: { companyId: string }) {
         {/* Rent Collected Card */}
         <div className="glass-panel glass-card-hover rounded-2xl p-5 border border-slate-200 flex justify-between items-center shadow-sm">
           <div className="space-y-1">
-            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">সাইকেলের ভাড়া আদায়</span>
+            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">মাসিক ভাড়া আদায়</span>
             <h3 className="text-xl font-extrabold tracking-tight text-emerald-500">৳ {currentCollected.toLocaleString()}</h3>
             <span className="text-[10px] text-emerald-500 font-bold">
               {lang === 'bn'
@@ -200,7 +170,7 @@ export default function Dashboard({ companyId }: { companyId: string }) {
         {/* Rent Due Card */}
         <div className="glass-panel glass-card-hover rounded-2xl p-5 border border-slate-200 flex justify-between items-center shadow-sm">
           <div className="space-y-1">
-            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">সাইকেলের বকেয়া ভাড়া</span>
+            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">মাসিক বকেয়া ভাড়া</span>
             <h3 className="text-xl font-extrabold tracking-tight text-rose-500">৳ {currentDue.toLocaleString()}</h3>
             <span className="text-[10px] text-rose-500 font-medium">
               {lang === 'bn' ? 'তাগাদা প্রয়োজন' : 'Action needed'}

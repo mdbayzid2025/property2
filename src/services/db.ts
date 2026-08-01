@@ -187,25 +187,25 @@ export interface AccountTransaction {
 
 // Global Demo Data Seeds
 const DEMO_COMPANIES: Company[] = [
-  { id: 'c1', name: 'বঙ্গ প্রোপার্টি হোল্ডিংস লিমিটেড (Bongo Holdings)', type: 'Real Estate Developer', address: 'ধানমন্ডি, ঢাকা', plan: 'Enterprise', expiryDate: '2027-12-31', suspended: false },
+  { id: 'c1', name: 'মহিউদ্দিন প্রোপার্টি হোল্ডিংস লিমিটেড (Mohoudin Holdings)', type: 'Real Estate Developer', address: 'ধানমন্ডি, ঢাকা', plan: 'Enterprise', expiryDate: '2027-12-31', suspended: false },
   { id: 'c2', name: 'অনন্যা হাইটস কমার্শিয়াল (Anannya Plaza)', type: 'Commercial Shopping Complex', address: 'গুলশান-২, ঢাকা', plan: 'Standard', expiryDate: '2026-12-31', suspended: false },
   { id: 'c3', name: 'আমান গ্রিন ভ্যালি (Aman Land Projects)', type: 'Housing & Land Developers', address: 'পূর্বাচল, ঢাকা', plan: 'Basic', expiryDate: '2026-09-30', suspended: false }
 ];
 
 const DEMO_PROPERTIES: Property[] = [
-  { id: 'p1', companyId: 'c1', name: 'বঙ্গ টাওয়ার (Dhanmondi)', type: 'mixed', address: 'রোড ৮/এ, ধানমন্ডি, ঢাকা', floors: 10, totalUnits: 15, status: 'active' },
+  { id: 'prop_alif_1', companyId: 'c1', name: 'আলিফ টাওয়ার-১ (Alif Tower-1)', type: 'mixed', address: 'রোড ৮/এ, ধানমন্ডি, ঢাকা', floors: 10, totalUnits: 15, status: 'active' },
   { id: 'p2', companyId: 'c2', name: 'অনন্যা প্লাজা (Gulshan)', type: 'commercial', address: 'গুলশান সার্কেল ২, ঢাকা', floors: 5, totalUnits: 5, status: 'active' },
   { id: 'p3', companyId: 'c3', name: 'আমান ভ্যালি ফেজ-১', type: 'land', address: 'সেক্টর ৪, পূর্বাচল, ঢাকা', floors: 0, totalUnits: 20, status: 'construction' }
 ];
 
 const DEMO_UNITS: Unit[] = [
-  // Bongo Tower
-  { id: 'u1', propertyId: 'p1', number: 'Flat A1', floor: 1, type: 'flat', sizeSqft: 1800, rentAmount: 32000, serviceCharge: 5000, securityDeposit: 64000, status: 'occupied', bedrooms: 3, bathrooms: 3, meterNumber: 'E-882711' },
-  { id: 'u2', propertyId: 'p1', number: 'Flat A2', floor: 1, type: 'flat', sizeSqft: 1800, rentAmount: 32000, serviceCharge: 5000, securityDeposit: 64000, status: 'vacant', bedrooms: 3, bathrooms: 3, meterNumber: 'E-882712' },
-  { id: 'u3', propertyId: 'p1', number: 'Flat B1', floor: 2, type: 'flat', sizeSqft: 1500, rentAmount: 26000, serviceCharge: 4000, securityDeposit: 52000, status: 'occupied', bedrooms: 3, bathrooms: 2, meterNumber: 'E-882721' },
-  { id: 'u4', propertyId: 'p1', number: 'Flat B2', floor: 2, type: 'flat', sizeSqft: 1500, rentAmount: 26000, serviceCharge: 4000, securityDeposit: 52000, status: 'maintenance', bedrooms: 3, bathrooms: 2, meterNumber: 'E-882722' },
-  { id: 'u5', propertyId: 'p1', number: 'Shop 101', floor: 0, type: 'shop', sizeSqft: 450, rentAmount: 45000, serviceCharge: 8000, securityDeposit: 90000, status: 'occupied', meterNumber: 'E-900101' },
-  { id: 'u6', propertyId: 'p1', number: 'Shop 102', floor: 0, type: 'shop', sizeSqft: 600, rentAmount: 60000, serviceCharge: 10000, securityDeposit: 120000, status: 'reserved', meterNumber: 'E-900102' },
+  // Alif Tower-1
+  { id: 'u1', propertyId: 'prop_alif_1', number: 'Flat A1', floor: 1, type: 'flat', sizeSqft: 1800, rentAmount: 32000, serviceCharge: 5000, securityDeposit: 64000, status: 'occupied', bedrooms: 3, bathrooms: 3, meterNumber: 'E-882711' },
+  { id: 'u2', propertyId: 'prop_alif_1', number: 'Flat A2', floor: 1, type: 'flat', sizeSqft: 1800, rentAmount: 32000, serviceCharge: 5000, securityDeposit: 64000, status: 'vacant', bedrooms: 3, bathrooms: 3, meterNumber: 'E-882712' },
+  { id: 'u3', propertyId: 'prop_alif_1', number: 'Flat B1', floor: 2, type: 'flat', sizeSqft: 1500, rentAmount: 26000, serviceCharge: 4000, securityDeposit: 52000, status: 'occupied', bedrooms: 3, bathrooms: 2, meterNumber: 'E-882721' },
+  { id: 'u4', propertyId: 'prop_alif_1', number: 'Flat B2', floor: 2, type: 'flat', sizeSqft: 1500, rentAmount: 26000, serviceCharge: 4000, securityDeposit: 52000, status: 'maintenance', bedrooms: 3, bathrooms: 2, meterNumber: 'E-882722' },
+  { id: 'u5', propertyId: 'prop_alif_1', number: 'Shop 101', floor: 0, type: 'shop', sizeSqft: 450, rentAmount: 45000, serviceCharge: 8000, securityDeposit: 90000, status: 'occupied', meterNumber: 'E-900101' },
+  { id: 'u6', propertyId: 'prop_alif_1', number: 'Shop 102', floor: 0, type: 'shop', sizeSqft: 600, rentAmount: 60000, serviceCharge: 10000, securityDeposit: 120000, status: 'reserved', meterNumber: 'E-900102' },
   
   // Anannya Plaza
   { id: 'u7', propertyId: 'p2', number: 'Office 201', floor: 2, type: 'office', sizeSqft: 3500, rentAmount: 120000, serviceCharge: 25000, securityDeposit: 240000, status: 'occupied', meterNumber: 'E-700201' },
@@ -382,7 +382,6 @@ export interface PreviousMonthBalance {
 }
 
 const NEW_DEMO_PROPERTIES: Property[] = [
-  { id: 'prop_alif_1', companyId: 'c1', name: 'আলিফ টাওয়ার-১ (Alif Tower-1)', type: 'mixed', address: 'মিরপুর, ঢাকা', floors: 7, totalUnits: 26, status: 'active' },
   { id: 'prop_alif_2', companyId: 'c1', name: 'আলিফ টাওয়ার-২ (Alif Tower-2)', type: 'mixed', address: 'মিরপুর, ঢাকা', floors: 5, totalUnits: 15, status: 'active' },
   { id: 'prop_mahira', companyId: 'c1', name: 'মাহিরা টাওয়ার (Mahira Tower)', type: 'residential', address: 'উত্তরা, ঢাকা', floors: 6, totalUnits: 12, status: 'active' },
   { id: 'prop_mohiuddin', companyId: 'c1', name: 'মহিউদ্দিন মার্কেট ও জায়গা (Mohiuddin Market)', type: 'commercial', address: 'মতিঝিল, ঢাকা', floors: 3, totalUnits: 30, status: 'active' }
@@ -470,52 +469,112 @@ const SEED_REPORT_BALANCES: PreviousMonthBalance[] = [
 
 export class MockDB {
   static init() {
-    if (!localStorage.getItem('bongo_companies')) {
-      localStorage.setItem('bongo_companies', JSON.stringify(DEMO_COMPANIES));
-      localStorage.setItem('bongo_properties', JSON.stringify(DEMO_PROPERTIES));
-      localStorage.setItem('bongo_units', JSON.stringify(DEMO_UNITS));
-      localStorage.setItem('bongo_tenants', JSON.stringify(DEMO_TENANTS));
-      localStorage.setItem('bongo_invoices', JSON.stringify(DEMO_INVOICES));
-      localStorage.setItem('bongo_receipts', JSON.stringify(DEMO_RECEIPTS));
-      localStorage.setItem('bongo_utilities', JSON.stringify(DEMO_UTILITIES));
-      localStorage.setItem('bongo_maintenance', JSON.stringify(DEMO_MAINTENANCE));
-      localStorage.setItem('bongo_visitors', JSON.stringify(DEMO_VISITORS));
-      localStorage.setItem('bongo_parking', JSON.stringify(DEMO_PARKING));
-      localStorage.setItem('bongo_employees', JSON.stringify(DEMO_EMPLOYEES));
-      localStorage.setItem('bongo_bookings', JSON.stringify(DEMO_BOOKINGS));
-      localStorage.setItem('bongo_installments', JSON.stringify(DEMO_INSTALLMENTS));
-      localStorage.setItem('bongo_transactions', JSON.stringify(DEMO_TRANSACTIONS));
+    if (!localStorage.getItem('mohoudin_companies')) {
+      localStorage.setItem('mohoudin_companies', JSON.stringify(DEMO_COMPANIES));
+      localStorage.setItem('mohoudin_properties', JSON.stringify(DEMO_PROPERTIES));
+      localStorage.setItem('mohoudin_units', JSON.stringify(DEMO_UNITS));
+      localStorage.setItem('mohoudin_tenants', JSON.stringify(DEMO_TENANTS));
+      localStorage.setItem('mohoudin_invoices', JSON.stringify(DEMO_INVOICES));
+      localStorage.setItem('mohoudin_receipts', JSON.stringify(DEMO_RECEIPTS));
+      localStorage.setItem('mohoudin_utilities', JSON.stringify(DEMO_UTILITIES));
+      localStorage.setItem('mohoudin_maintenance', JSON.stringify(DEMO_MAINTENANCE));
+      localStorage.setItem('mohoudin_visitors', JSON.stringify(DEMO_VISITORS));
+      localStorage.setItem('mohoudin_parking', JSON.stringify(DEMO_PARKING));
+      localStorage.setItem('mohoudin_employees', JSON.stringify(DEMO_EMPLOYEES));
+      localStorage.setItem('mohoudin_bookings', JSON.stringify(DEMO_BOOKINGS));
+      localStorage.setItem('mohoudin_installments', JSON.stringify(DEMO_INSTALLMENTS));
+      localStorage.setItem('mohoudin_transactions', JSON.stringify(DEMO_TRANSACTIONS));
     }
     
-    // Seed new reporting properties if they do not exist
-    const currentProps = JSON.parse(localStorage.getItem('bongo_properties') || '[]');
-    if (!currentProps.some((p: any) => p.id === 'prop_alif_1')) {
-      currentProps.push(...NEW_DEMO_PROPERTIES);
-      localStorage.setItem('bongo_properties', JSON.stringify(currentProps));
+    // Deduplicate properties and remap any legacy 'p1' references to 'prop_alif_1'
+    let currentProps = JSON.parse(localStorage.getItem('mohoudin_properties') || '[]');
+    let currentUnits = JSON.parse(localStorage.getItem('mohoudin_units') || '[]');
+    
+    // Remap units referencing 'p1' to 'prop_alif_1'
+    let unitsModified = false;
+    currentUnits = currentUnits.map((u: any) => {
+      if (u.propertyId === 'p1') {
+        unitsModified = true;
+        return { ...u, propertyId: 'prop_alif_1' };
+      }
+      return u;
+    });
+    if (unitsModified) {
+      localStorage.setItem('mohoudin_units', JSON.stringify(currentUnits));
     }
 
-    if (!localStorage.getItem('bongo_report_income')) {
-      localStorage.setItem('bongo_report_income', JSON.stringify(SEED_REPORT_INCOME));
+    // Remap properties list: ensure only one 'prop_alif_1' exists and no duplicate 'Alif Tower-1'
+    const seenPropIds = new Set<string>();
+    const seenPropNames = new Set<string>();
+    const deduplicatedProps: Property[] = [];
+    let propsModified = false;
+
+    for (const p of currentProps) {
+      const normalizedId = p.id === 'p1' ? 'prop_alif_1' : p.id;
+      const isAlif1 = normalizedId === 'prop_alif_1' || p.name.includes('Alif Tower-1') || p.name.includes('আলিফ টাওয়ার-১') || (p.name.includes('Alif Tower') && !p.name.includes('Alif Tower-2'));
+      
+      if (isAlif1) {
+        if (!seenPropNames.has('Alif Tower-1')) {
+          seenPropNames.add('Alif Tower-1');
+          seenPropIds.add('prop_alif_1');
+          deduplicatedProps.push({
+            id: 'prop_alif_1',
+            companyId: 'c1',
+            name: 'আলিফ টাওয়ার-১ (Alif Tower-1)',
+            type: 'mixed',
+            address: 'রোড ৮/এ, ধানমন্ডি, ঢাকা',
+            floors: 10,
+            totalUnits: 15,
+            status: 'active'
+          });
+        } else {
+          propsModified = true;
+        }
+      } else {
+        if (!seenPropIds.has(p.id) && !seenPropNames.has(p.name)) {
+          seenPropIds.add(p.id);
+          seenPropNames.add(p.name);
+          deduplicatedProps.push({ ...p, id: normalizedId });
+        } else {
+          propsModified = true;
+        }
+      }
     }
-    if (!localStorage.getItem('bongo_report_expense')) {
-      localStorage.setItem('bongo_report_expense', JSON.stringify(SEED_REPORT_EXPENSE));
+
+    // Ensure all NEW_DEMO_PROPERTIES exist in deduplicatedProps
+    for (const newProp of NEW_DEMO_PROPERTIES) {
+      if (!deduplicatedProps.some((p: any) => p.id === newProp.id || p.name === newProp.name)) {
+        deduplicatedProps.push(newProp);
+        propsModified = true;
+      }
     }
-    if (!localStorage.getItem('bongo_report_adjustments')) {
-      localStorage.setItem('bongo_report_adjustments', JSON.stringify(SEED_REPORT_ADJUSTMENTS));
+
+    if (propsModified || deduplicatedProps.length !== currentProps.length) {
+      localStorage.setItem('mohoudin_properties', JSON.stringify(deduplicatedProps));
     }
-    if (!localStorage.getItem('bongo_report_balances')) {
-      localStorage.setItem('bongo_report_balances', JSON.stringify(SEED_REPORT_BALANCES));
+
+    if (!localStorage.getItem('mohoudin_report_income')) {
+      localStorage.setItem('mohoudin_report_income', JSON.stringify(SEED_REPORT_INCOME));
+    }
+    if (!localStorage.getItem('mohoudin_report_expense')) {
+      localStorage.setItem('mohoudin_report_expense', JSON.stringify(SEED_REPORT_EXPENSE));
+    }
+    if (!localStorage.getItem('mohoudin_report_adjustments')) {
+      localStorage.setItem('mohoudin_report_adjustments', JSON.stringify(SEED_REPORT_ADJUSTMENTS));
+    }
+    if (!localStorage.getItem('mohoudin_report_balances')) {
+      localStorage.setItem('mohoudin_report_balances', JSON.stringify(SEED_REPORT_BALANCES));
     }
   }
 
   static getTable<T>(name: string): T[] {
     this.init();
-    const data = localStorage.getItem(`bongo_${name}`);
+    const data = localStorage.getItem(`mohoudin_${name}`);
     return data ? JSON.parse(data) : [];
   }
 
   static saveTable<T>(name: string, data: T[]) {
-    localStorage.setItem(`bongo_${name}`, JSON.stringify(data));
+    localStorage.setItem(`mohoudin_${name}`, JSON.stringify(data));
   }
 
   // Helper CRUDs

@@ -102,7 +102,7 @@ export default function MaintenanceManager({ companyId }: { companyId: string })
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-2xl bg-white border border-slate-200 flex justify-between items-center shadow-sm">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 block uppercase">সাইকেলে মোট টিকিট</span>
+            <span className="text-[11px] font-bold text-slate-400 block uppercase">মাসিক মোট টিকিট</span>
             <span className="text-xl font-black text-slate-800">{filteredRequests.length} টি</span>
           </div>
           <Wrench className="w-5 h-5 text-indigo-500" />
@@ -118,7 +118,7 @@ export default function MaintenanceManager({ companyId }: { companyId: string })
         </div>
         <div className="p-4 rounded-2xl bg-white border border-slate-200 flex justify-between items-center shadow-sm">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 block uppercase">সাইকেলের রক্ষণাবেক্ষণ ব্যয়</span>
+            <span className="text-[11px] font-bold text-slate-400 block uppercase">মাসিক রক্ষণাবেক্ষণ ব্যয়</span>
             <span className="text-xl font-black text-rose-500">৳ {totalMaintenanceCost.toLocaleString()}</span>
           </div>
           <DollarSign className="w-5 h-5 text-rose-500" />
@@ -132,7 +132,7 @@ export default function MaintenanceManager({ companyId }: { companyId: string })
         <div className="space-y-3">
           {filteredRequests.length === 0 ? (
             <div className="p-8 text-center text-slate-400 text-xs font-medium">
-              নির্বাচিত সাইকেলে কোনো মেরামত/রক্ষণাবেক্ষণ টিকিট পাওয়া যায়নি।
+              নির্বাচিত মাসে কোনো মেরামত/রক্ষণাবেক্ষণ টিকিট পাওয়া যায়নি।
             </div>
           ) : (
             filteredRequests.map((req) => {

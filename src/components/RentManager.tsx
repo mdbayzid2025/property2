@@ -4,6 +4,8 @@ import { MockDB, Invoice, Receipt, Tenant, Unit, AccountTransaction, Property } 
 import {
   FiscalCycleState,
   DEFAULT_FISCAL_CYCLE,
+  MONTH_NAMES_EN,
+  MONTH_NAMES_BN,
   getFiscalDateRange
 } from '../services/fiscalCycle';
 import { filterRecordsByFiscalCycle } from '../services/mongoQueryHelper';
@@ -42,7 +44,14 @@ export default function RentManager({ companyId }: { companyId: string }) {
   // Input states for Manual Rent Invoice
   const [tenantId, setTenantId] = useState('');
   const [amount, setAmount] = useState('');
-  const [billingMonth, setBillingMonth] = useState('July 2026');
+
+  const now = new Date();
+  const currentMonthName = MONTH_NAMES_EN[now.getMonth()] || 'July';
+  const currentYearVal = now.getFullYear();
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(currentMonthName);
+  const [selectedYear, setSelectedYear] = useState<number>(currentYearVal);
+  const billingMonth = `${selectedMonth} ${selectedYear}`;
   const [details, setDetails] = useState('');
 
   const handleTenantSelect = (id: string) => {
@@ -243,13 +252,33 @@ export default function RentManager({ companyId }: { companyId: string }) {
 
                 <div>
                   <label className="text-xs text-slate-500 block mb-1">Billing Period / Month *</label>
-                  <input
-                    type="text"
-                    value={billingMonth}
-                    onChange={(e) => setBillingMonth(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
-                    required
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800 font-semibold cursor-pointer"
+                      required
+                    >
+                      {MONTH_NAMES_EN.map((m, idx) => (
+                        <option key={m} value={m}>
+                          {lang === 'bn' ? MONTH_NAMES_BN[idx] : m}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(Number(e.target.value))}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800 font-semibold cursor-pointer"
+                      required
+                    >
+                      {[2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
+                        <option key={y} value={y}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -300,7 +329,7 @@ export default function RentManager({ companyId }: { companyId: string }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-2xl bg-white border border-slate-200 flex justify-between items-center shadow-sm">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase">সাইকেলের প্রাপ্য মোট ভাড়া</span>
+            <span className="text-[11px] font-bold text-slate-400 uppercase">মাসিক প্রাপ্য মোট ভাড়া</span>
             <h3 className="text-lg font-black text-slate-800">৳ {totalReceivable.toLocaleString()}</h3>
             <span className="text-[10px] text-slate-500">{startDate} ~ {endDate}</span>
           </div>
@@ -376,7 +405,7 @@ export default function RentManager({ companyId }: { companyId: string }) {
               <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                 <th className="p-3">ইনভয়েস / টার্গেট</th>
                 <th className="p-3">ভাড়াটিয়ার তথ্য</th>
-                <th className="p-3">বিলিং সাইকেল & অ্যাডভান্স মোড</th>
+                <th className="p-3">মাসিক বিলিং ও অ্যাডভান্স মোড</th>
                 <th className="p-3 text-right">নির্ধারিত ভাড়া</th>
                 <th className="p-3 text-right">আদায়কৃত</th>
                 <th className="p-3 text-center">স্ট্যাটাস</th>
@@ -387,7 +416,7 @@ export default function RentManager({ companyId }: { companyId: string }) {
               {filteredInvoices.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-8 text-center text-slate-400">
-                    নির্বাচিত সাইকেলে কোনো ভাড়া ইনভয়েস পাওয়া যায়নি।
+                    নির্বাচিত মাসে কোনো ভাড়া ইনভয়েস পাওয়া যায়নি।
                   </td>
                 </tr>
               ) : (

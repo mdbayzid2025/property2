@@ -537,7 +537,7 @@ export default function TenantManager({ companyId }: { companyId: string }) {
 
                   <div className="space-y-3 text-[11px] font-sans">
                     <p>
-                      <strong>১ম পক্ষ (প্রপার্টি মালিক):</strong> বঙ্গ প্রোপার্টি হোল্ডিংস লিমিটেড (ম্যানেজার পক্ষে).
+                      <strong>১ম পক্ষ (প্রপার্টি মালিক):</strong> মহিউদ্দিন প্রোপার্টি হোল্ডিংস লিমিটেড (ম্যানেজার পক্ষে).
                     </p>
                     <p>
                       <strong>২য় পক্ষ (ভাড়াটিয়া):</strong> {viewingDocTenant.name}, মোবাইল: {viewingDocTenant.phone}.
