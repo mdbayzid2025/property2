@@ -132,79 +132,79 @@ export default function SalesBooking({ companyId }: { companyId: string }) {
       </div>
 
       {showBookingForm && (
-        <form onSubmit={handleCreateBooking} className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 grid grid-cols-1 md:grid-cols-4 gap-4 animate-slide-in">
+        <form onSubmit={handleCreateBooking} className="glass-panel rounded-2xl p-5 border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-4 animate-slide-in">
           <div>
-            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Customer Name</label>
+            <label className="text-xs text-slate-500 block mb-1">Customer Name</label>
             <input 
               type="text" 
               value={custName}
               onChange={(e) => setCustName(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-300 outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none"
               placeholder="e.g. মোঃ মাহাবুব"
               required
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Customer Phone</label>
+            <label className="text-xs text-slate-500 block mb-1">Customer Phone</label>
             <input 
               type="text" 
               value={custPhone}
               onChange={(e) => setCustPhone(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-300 outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-800 rounded-xl text-xs text-slate-800 outline-none"
               required
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Select Flat / Shop</label>
+            <label className="text-xs text-slate-500 block mb-1">Select Flat / Shop</label>
             <select
               value={targetUnit}
               onChange={(e) => setTargetUnit(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-300 outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-800 rounded-xl text-xs text-slate-800 outline-none"
               required
             >
-              <option value="" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">-- Choose Unit --</option>
+              <option value="" className="bg-white text-slate-800">-- Choose Unit --</option>
               {availableUnits.map(u => (
-                <option key={u.id} value={u.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">{u.number} ({u.type.toUpperCase()})</option>
+                <option key={u.id} value={u.id} className="bg-white text-slate-800">{u.number} ({u.type.toUpperCase()})</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Total Pricing (BDT)</label>
+            <label className="text-xs text-slate-500 block mb-1">Total Pricing (BDT)</label>
             <input 
               type="number" 
               value={totalVal}
               onChange={(e) => setTotalVal(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-850 rounded-xl text-xs text-slate-800 dark:text-slate-300 outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-850 rounded-xl text-xs text-slate-800 outline-none"
               required
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Token Booking Money</label>
+            <label className="text-xs text-slate-500 block mb-1">Token Booking Money</label>
             <input 
               type="number" 
               value={bookingAmt}
               onChange={(e) => setBookingAmt(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-850 rounded-xl text-xs text-slate-800 dark:text-slate-300 outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-850 rounded-xl text-xs text-slate-800 outline-none"
               required
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Down Payment (BDT)</label>
+            <label className="text-xs text-slate-500 block mb-1">Down Payment (BDT)</label>
             <input 
               type="number" 
               value={downPay}
               onChange={(e) => setDownPay(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-850 rounded-xl text-xs text-slate-800 dark:text-slate-300 outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-850 rounded-xl text-xs text-slate-800 outline-none"
               required
             />
           </div>
           <div>
-            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Installment Count (Months)</label>
+            <label className="text-xs text-slate-500 block mb-1">Installment Count (Months)</label>
             <input 
               type="number" 
               value={instCount}
               onChange={(e) => setInstCount(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-850 rounded-xl text-xs text-slate-800 dark:text-slate-300 outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-850 rounded-xl text-xs text-slate-800 outline-none"
               required
             />
           </div>
@@ -222,7 +222,7 @@ export default function SalesBooking({ companyId }: { companyId: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Customer Leads / Bookings Sidebar list */}
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 space-y-4">
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200 space-y-4">
           <span className="font-bold text-sm block">Active Sales Bookings</span>
           <div className="space-y-2">
             {bookings.map((b) => (
@@ -232,14 +232,14 @@ export default function SalesBooking({ companyId }: { companyId: string }) {
                 className={`w-full p-3 rounded-xl border text-left flex justify-between items-center transition-all ${
                   selectedBooking?.id === b.id 
                     ? 'border-sky-500 bg-sky-500/10' 
-                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50 dark:bg-slate-950/20'
+                    : 'border-slate-200  hover:border-slate-300  bg-slate-50 '
                 }`}
               >
                 <div>
-                  <h4 className="font-bold text-xs text-slate-800 dark:text-slate-300">{b.customerName}</h4>
+                  <h4 className="font-bold text-xs text-slate-800">{b.customerName}</h4>
                   <p className="text-[9px] text-slate-500 mt-0.5">Total Value: ৳{b.totalPrice.toLocaleString()}</p>
                 </div>
-                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold">Active</span>
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded-full font-bold">Active</span>
               </button>
             ))}
           </div>
@@ -247,32 +247,32 @@ export default function SalesBooking({ companyId }: { companyId: string }) {
 
         {/* Selected Booking EMI Ledger */}
         {selectedBooking && (
-          <div className="lg:col-span-2 glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 space-y-4 animate-slide-in">
-            <div className="flex justify-between items-start border-b border-slate-200 dark:border-slate-800 pb-3">
+          <div className="lg:col-span-2 glass-panel rounded-2xl p-5 border border-slate-200 space-y-4 animate-slide-in">
+            <div className="flex justify-between items-start border-b border-slate-200 pb-3">
               <div>
-                <h3 className="font-extrabold text-sm text-slate-800 dark:text-slate-200">{selectedBooking.customerName} (Client)</h3>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Phone: {selectedBooking.customerPhone} • Unit: {units.find(u => u.id === selectedBooking.unitId)?.number}</p>
+                <h3 className="font-extrabold text-sm text-slate-800">{selectedBooking.customerName} (Client)</h3>
+                <p className="text-[10px] text-slate-500 mt-0.5">Phone: {selectedBooking.customerPhone} • Unit: {units.find(u => u.id === selectedBooking.unitId)?.number}</p>
               </div>
               <div className="text-right">
-                <span className="text-xs text-slate-600 dark:text-slate-400">Total Price: ৳{selectedBooking.totalPrice.toLocaleString()}</span>
-                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">Token: ৳{selectedBooking.bookingAmount.toLocaleString()} paid</p>
+                <span className="text-xs text-slate-600">Total Price: ৳{selectedBooking.totalPrice.toLocaleString()}</span>
+                <p className="text-[10px] text-emerald-600 mt-1 font-semibold">Token: ৳{selectedBooking.bookingAmount.toLocaleString()} paid</p>
               </div>
             </div>
 
             {/* Installments Ledger list */}
             <div>
-              <span className="font-bold text-xs text-slate-800 dark:text-slate-300 block mb-3">Installment schedule (EMI Ledger)</span>
+              <span className="font-bold text-xs text-slate-800 block mb-3">Installment schedule (EMI Ledger)</span>
               
               <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
                 {installments.filter(i => i.bookingId === selectedBooking.id).map((inst) => (
-                  <div key={inst.id} className="p-3 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-850 rounded-xl flex justify-between items-center text-xs">
+                  <div key={inst.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center text-xs">
                     <div>
-                      <span className="font-bold text-slate-800 dark:text-slate-300">Installment #{inst.installmentNo}</span>
+                      <span className="font-bold text-slate-800">Installment #{inst.installmentNo}</span>
                       <p className="text-[9px] text-slate-500 mt-0.5">Due: {inst.dueDate}</p>
                     </div>
                     
                     <div className="flex items-center gap-4">
-                      <span className="font-bold text-slate-800 dark:text-slate-300">৳ {inst.amount.toLocaleString()}</span>
+                      <span className="font-bold text-slate-800">৳ {inst.amount.toLocaleString()}</span>
                       
                       {inst.status === 'paid' ? (
                         <span className="px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 font-bold rounded-lg text-[10px]">Paid</span>

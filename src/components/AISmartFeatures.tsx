@@ -37,7 +37,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Vacancy Predictor */}
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 flex flex-col justify-between">
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-4">
               <span className="text-sm font-semibold flex items-center gap-2">
@@ -51,7 +51,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
                 <span>Flat B2 (Maintenance)</span>
                 <span className="font-semibold text-amber-400">92% fill probability in 14 days</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+              <div className="w-full bg-slate-200 rounded-full h-2">
                 <div className="bg-emerald-500 h-2 rounded-full" style={{ width: '92%' }}></div>
               </div>
               
@@ -59,7 +59,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
                 <span>Office 301 (Vacant)</span>
                 <span className="font-semibold text-emerald-400">74% fill probability in 30 days</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+              <div className="w-full bg-slate-200 rounded-full h-2">
                 <div className="bg-emerald-500 h-2 rounded-full" style={{ width: '74%' }}></div>
               </div>
             </div>
@@ -70,7 +70,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
         </div>
 
         {/* Rent Suggestion Form */}
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200">
           <div className="flex justify-between items-center mb-3">
             <span className="text-sm font-semibold flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-sky-400" />
@@ -86,7 +86,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
                   type="number" 
                   value={size} 
                   onChange={(e) => setSize(Number(e.target.value))}
-                  className="w-full p-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-blue-950/40 rounded-lg text-xs outline-none"
+                  className="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg text-xs outline-none"
                 />
               </div>
               <div>
@@ -94,7 +94,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
                 <select 
                   value={facing} 
                   onChange={(e) => setFacing(e.target.value)}
-                  className="w-full p-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-blue-950/40 rounded-lg text-xs outline-none"
+                  className="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg text-xs outline-none"
                 >
                   <option value="South">South facing (দক্ষিণ মুখী)</option>
                   <option value="East">East facing (পূর্ব মুখী)</option>
@@ -110,7 +110,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
                   type="number" 
                   value={beds} 
                   onChange={(e) => setBeds(Number(e.target.value))}
-                  className="w-full p-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-blue-950/40 rounded-lg text-xs outline-none"
+                  className="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg text-xs outline-none"
                 />
               </div>
               <div>
@@ -119,7 +119,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
                   type="number" 
                   value={baths} 
                   onChange={(e) => setBaths(Number(e.target.value))}
-                  className="w-full p-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-blue-950/40 rounded-lg text-xs outline-none"
+                  className="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg text-xs outline-none"
                 />
               </div>
             </div>
@@ -139,14 +139,14 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
         </div>
 
         {/* Tenant Risk Score */}
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200">
           <span className="text-sm font-semibold flex items-center gap-2 mb-3">
             <ShieldAlert className="w-4 h-4 text-rose-400" />
             {t('aiRiskScore')}
           </span>
 
           <div className="space-y-3">
-            <div className="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-900/40 rounded-xl">
+            <div className="flex justify-between items-center p-2.5 bg-slate-100 rounded-xl">
               <div>
                 <h4 className="text-xs font-semibold">কামরুল হাসান চৌধুরী (Flat A1)</h4>
                 <p className="text-[10px] text-slate-400">Govt Officer, Active lease</p>
@@ -157,7 +157,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
               </div>
             </div>
 
-            <div className="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-900/40 rounded-xl">
+            <div className="flex justify-between items-center p-2.5 bg-slate-100 rounded-xl">
               <div>
                 <h4 className="text-xs font-semibold">রফিকুল আলম (Shop 101)</h4>
                 <p className="text-[10px] text-slate-400">Merchant, Partial payment due</p>
@@ -171,7 +171,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
         </div>
 
         {/* Revenue Forecast Chart */}
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200">
           <span className="text-sm font-semibold flex items-center gap-2 mb-3">
             <TrendingUp className="w-4 h-4 text-purple-400" />
             {t('aiForecastRevenue')}
@@ -190,7 +190,7 @@ export default function AISmartFeatures({ companyId }: { companyId: string }) {
                 <span className="absolute -top-6 text-[10px] bg-slate-800 text-white px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   {col.v}
                 </span>
-                <div className="w-4 bg-sky-500/30 dark:bg-sky-500/20 group-hover:bg-sky-400 rounded-t-sm transition-all" style={{ height: col.h }}></div>
+                <div className="w-4 bg-sky-500/30 group-hover:bg-sky-400 rounded-t-sm transition-all" style={{ height: col.h }}></div>
                 <span className="text-[10px] text-slate-400 mt-2">{col.m}</span>
               </div>
             ))}

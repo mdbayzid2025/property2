@@ -137,7 +137,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Invoice Lists & Payment */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+          <div className="glass-panel rounded-2xl p-5 border border-slate-200">
             <span className="font-bold text-sm flex items-center gap-2 mb-4 text-emerald-400">
               <CreditCard className="w-4 h-4" />
               Rents & Bills Ledger
@@ -145,17 +145,17 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
 
             <div className="space-y-3">
               {invoices.map((inv) => (
-                <div key={inv.id} className="p-4 bg-slate-100 dark:bg-slate-900/40 border border-slate-200 dark:border-blue-950/40 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div key={inv.id} className="p-4 bg-slate-100 border border-slate-200 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
-                    <h3 className="font-bold text-xs text-slate-800 dark:text-slate-300">{inv.billingMonth} Rent & Utilities</h3>
-                    <p className="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5">{inv.details}</p>
+                    <h3 className="font-bold text-xs text-slate-800">{inv.billingMonth} Rent & Utilities</h3>
+                    <p className="text-[10px] text-slate-600 mt-0.5">{inv.details}</p>
                     <div className="flex gap-2 mt-2">
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400">Due: {inv.dueDate}</span>
-                      {inv.paymentMethod && <span className="text-[10px] text-sky-600 dark:text-sky-400">via {inv.paymentMethod}</span>}
+                      <span className="text-[10px] text-slate-500">Due: {inv.dueDate}</span>
+                      {inv.paymentMethod && <span className="text-[10px] text-sky-600">via {inv.paymentMethod}</span>}
                     </div>
                   </div>
                   <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-300">৳ {inv.amount.toLocaleString()}</span>
+                    <span className="text-sm font-bold text-slate-800">৳ {inv.amount.toLocaleString()}</span>
                     {inv.status === 'paid' ? (
                       <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-lg font-bold">Paid (পরিশোধিত)</span>
                     ) : (
@@ -173,7 +173,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
           </div>
 
           {/* Submissions of Maintenance */}
-          <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+          <div className="glass-panel rounded-2xl p-5 border border-slate-200">
             <span className="font-bold text-sm flex items-center gap-2 mb-4 text-amber-400">
               <Wrench className="w-4 h-4" />
               File Maintenance Complaints
@@ -182,37 +182,37 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
             <form onSubmit={handleIssueSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Issue / সমস্যা</label>
+                  <label className="text-xs text-slate-500 block mb-1">Issue / সমস্যা</label>
                   <input
                     type="text"
                     value={issueTitle}
                     onChange={(e) => setIssueTitle(e.target.value)}
                     placeholder="e.g. পানির ফিল্টার নষ্ট বা লাইট ফিউজ"
-                    className="w-full p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-blue-950/40 rounded-xl outline-none focus:border-amber-500 text-xs text-slate-800 dark:text-slate-100"
+                    className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl outline-none focus:border-amber-500 text-xs text-slate-800"
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Priority / জরুরী অবস্থা</label>
+                  <label className="text-xs text-slate-500 block mb-1">Priority / জরুরী অবস্থা</label>
                   <select
                     value={issuePriority}
                     onChange={(e: any) => setIssuePriority(e.target.value)}
-                    className="w-full p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-blue-950/40 rounded-xl outline-none focus:border-amber-500 text-xs text-slate-800 dark:text-slate-300"
+                    className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl outline-none focus:border-amber-500 text-xs text-slate-800"
                   >
-                    <option value="low" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">Low (সাধারণ)</option>
-                    <option value="medium" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">Medium (জরুরী)</option>
-                    <option value="high" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">High (উচ্চ জরুরী)</option>
+                    <option value="low" className="bg-white text-slate-800">Low (সাধারণ)</option>
+                    <option value="medium" className="bg-white text-slate-800">Medium (জরুরী)</option>
+                    <option value="high" className="bg-white text-slate-800">High (উচ্চ জরুরী)</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Description / বিবরণ</label>
+                <label className="text-xs text-slate-500 block mb-1">Description / বিবরণ</label>
                 <textarea
                   value={issueDesc}
                   onChange={(e) => setIssueDesc(e.target.value)}
                   placeholder="বিস্তারিত সমস্যাটি এখানে লিখুন যেন টেকনিশিয়ানের বুঝতে সুবিধা হয়..."
-                  className="w-full h-24 p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-blue-950/40 rounded-xl outline-none focus:border-amber-500 text-xs text-slate-800 dark:text-slate-100"
+                  className="w-full h-24 p-2.5 bg-slate-100 border border-slate-200 rounded-xl outline-none focus:border-amber-500 text-xs text-slate-800"
                   required
                 />
               </div>
@@ -229,7 +229,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
 
         {/* Notice Board and Status list */}
         <div className="space-y-6">
-          <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+          <div className="glass-panel rounded-2xl p-5 border border-slate-200">
             <span className="font-bold text-sm flex items-center gap-2 mb-4 text-purple-400">
               <Megaphone className="w-4 h-4" />
               Property Notices
@@ -237,16 +237,16 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
 
             <div className="space-y-3">
               <div className="p-3 bg-purple-500/5 border border-purple-500/10 rounded-xl">
-                <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold block">July 06, 2026</span>
-                <h4 className="text-xs font-bold mt-1 text-slate-800 dark:text-slate-200">লিফট সাময়িক বন্ধ থাকবে (Lift Under AMC)</h4>
-                <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                <span className="text-[10px] text-purple-600 font-semibold block">July 06, 2026</span>
+                <h4 className="text-xs font-bold mt-1 text-slate-800">লিফট সাময়িক বন্ধ থাকবে (Lift Under AMC)</h4>
+                <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                   রক্ষণাবেক্ষণ কাজের জন্য আগামী ৭ই জুলাই সকাল ১০:০০ থেকে দুপুর ১২:০০ পর্যন্ত লিফট বন্ধ থাকবে। সাময়িক অসুবিধার জন্য দুঃখিত।
                 </p>
               </div>
 
-              <div className="p-3 bg-slate-100 dark:bg-slate-900/40 rounded-xl">
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold block">June 28, 2026</span>
-                <h4 className="text-xs font-bold mt-1 text-slate-800 dark:text-slate-200">জেনারেটর ব্যাকআপ চার্জ বন্টন</h4>
+              <div className="p-3 bg-slate-100 rounded-xl">
+                <span className="text-[10px] text-slate-500 font-semibold block">June 28, 2026</span>
+                <h4 className="text-xs font-bold mt-1 text-slate-800">জেনারেটর ব্যাকআপ চার্জ বন্টন</h4>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
                   বিদ্যুৎ সংকটের কারণে জেনারেটর সার্ভিস বাড়ানোর সিদ্ধান্ত নেওয়া হয়েছে। সবার নিজ নিজ মিটারে অতিরিক্ত ২৫০৳ জেনারেটর চার্জ যুক্ত হবে।
                 </p>
@@ -254,7 +254,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
             </div>
           </div>
 
-          <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+          <div className="glass-panel rounded-2xl p-5 border border-slate-200">
             <span className="font-bold text-sm flex items-center gap-2 mb-3 text-sky-400">
               <Wrench className="w-4 h-4" />
               Ticket Activity History
@@ -265,9 +265,9 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
                 <p className="text-xs text-slate-400 text-center py-4">No active tickets submitted yet</p>
               ) : (
                 maintenance.map((m) => (
-                  <div key={m.id} className="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-900/20 rounded-xl">
+                  <div key={m.id} className="flex justify-between items-center p-2.5 bg-slate-100 rounded-xl">
                     <div>
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-300">{m.title}</span>
+                      <span className="text-xs font-bold text-slate-800">{m.title}</span>
                       <p className="text-[9px] text-slate-500">Submitted: {m.createdAt}</p>
                     </div>
                     <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${
@@ -288,7 +288,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
       {/* MFS Checkout Dialog Simulator */}
       {activeInvoice && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-          <div className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl glass-panel border border-slate-200 dark:border-blue-900/30 animate-slide-in">
+          <div className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl glass-panel border border-slate-200 animate-slide-in">
             {/* Brands Selection */}
             <div className="p-6 text-center space-y-4">
               <div className="flex gap-2 mb-4">
@@ -296,8 +296,8 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
                   onClick={() => { setMfsGateway('bkash'); setCheckoutStep('phone'); }}
                   className={`flex-1 p-2.5 rounded-xl border flex items-center justify-center text-xs font-bold transition-all ${
                     mfsGateway === 'bkash' 
-                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:text-rose-400' 
-                      : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 dark:text-slate-400'
+                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 ' 
+                      : 'border-slate-200  hover:border-slate-300  text-slate-500 '
                   }`}
                 >
                   <Smartphone className="w-4 h-4 mr-2" />
@@ -307,8 +307,8 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
                   onClick={() => { setMfsGateway('nagad'); setCheckoutStep('phone'); }}
                   className={`flex-1 p-2.5 rounded-xl border flex items-center justify-center text-xs font-bold transition-all ${
                     mfsGateway === 'nagad' 
-                      ? 'border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400' 
-                      : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-600 text-slate-500 dark:text-slate-400'
+                      ? 'border-orange-500 bg-orange-500/10 text-orange-600 ' 
+                      : 'border-slate-200  hover:border-slate-300  text-slate-500 '
                   }`}
                 >
                   <Smartphone className="w-4 h-4 mr-2" />
@@ -318,17 +318,17 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
 
               {checkoutStep === 'phone' && (
                 <div className="space-y-4">
-                  <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">
+                  <h3 className="font-bold text-sm text-slate-800">
                     {mfsGateway === 'bkash' ? 'bKash Merchant Payment' : 'Nagad Pay Checkout'}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Payable amount: <span className="font-bold text-sky-600 dark:text-sky-400">৳ {activeInvoice.amount.toLocaleString()}</span></p>
+                  <p className="text-xs text-slate-500">Payable amount: <span className="font-bold text-sky-600">৳ {activeInvoice.amount.toLocaleString()}</span></p>
                   <div>
                     <input 
                       type="text" 
                       placeholder="e.g. 017XXXXXXXX"
                       value={mfsPhone}
                       onChange={(e) => setMfsPhone(e.target.value)}
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:border-sky-500 text-center text-sm tracking-wider text-slate-800 dark:text-slate-300"
+                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-sky-500 text-center text-sm tracking-wider text-slate-800"
                     />
                   </div>
                 </div>
@@ -336,8 +336,8 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
 
               {checkoutStep === 'pin' && (
                 <div className="space-y-4">
-                  <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">Enter Account PIN</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Verification code & PIN is encrypted & secure</p>
+                  <h3 className="font-bold text-sm text-slate-800">Enter Account PIN</h3>
+                  <p className="text-xs text-slate-500">Verification code & PIN is encrypted & secure</p>
                   <div>
                     <input 
                       type="password" 
@@ -345,7 +345,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
                       value={mfsPin}
                       maxLength={4}
                       onChange={(e) => setMfsPin(e.target.value)}
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:border-sky-500 text-center text-lg tracking-[1em] text-slate-800 dark:text-slate-300"
+                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-sky-500 text-center text-lg tracking-[1em] text-slate-800"
                     />
                   </div>
                 </div>
@@ -354,7 +354,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
               {checkoutStep === 'processing' && (
                 <div className="py-8 flex flex-col items-center space-y-4">
                   <div className="w-10 h-10 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Validating transaction with bank API...</p>
+                  <p className="text-xs text-slate-500">Validating transaction with bank API...</p>
                 </div>
               )}
 
@@ -363,7 +363,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
                   <CheckCircle2 className="w-12 h-12 text-emerald-400 animate-bounce" />
                   <div className="text-center">
                     <p className="text-xs text-emerald-400 font-bold">Payment Completed Successfully</p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Invoice cleared. Receipt generated.</p>
+                    <p className="text-[10px] text-slate-500 mt-1">Invoice cleared. Receipt generated.</p>
                   </div>
                 </div>
               )}
@@ -382,7 +382,7 @@ export default function TenantPortal({ tenantId }: { tenantId: string }) {
                     <>
                       <button 
                         onClick={() => setActiveInvoice(null)}
-                        className="w-1/2 py-2.5 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-semibold"
+                        className="w-1/2 py-2.5 border border-slate-200 hover:border-slate-300 text-slate-600 rounded-xl text-xs font-semibold"
                       >
                         Cancel
                       </button>

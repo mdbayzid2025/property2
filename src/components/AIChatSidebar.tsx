@@ -84,15 +84,15 @@ export default function AIChatSidebar({ isOpen, onClose }: { isOpen: boolean; on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 w-80 md:w-96 glass-panel border-l border-slate-200 dark:border-blue-900/30 shadow-2xl flex flex-col z-50 animate-slide-in">
+    <div className="fixed inset-y-0 right-0 w-80 md:w-96 glass-panel border-l border-slate-200 shadow-2xl flex flex-col z-50 animate-slide-in">
       {/* Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-blue-950/40 flex justify-between items-center bg-sky-500/5">
+      <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-sky-500/5">
         <div className="flex items-center space-x-2">
           <Bot className="w-5 h-5 text-sky-400" />
           <span className="font-bold text-sm">{t('aiChatAssistant')}</span>
           <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
         </div>
-        <button onClick={onClose} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+        <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg">
           <X className="w-5 h-5 text-slate-400" />
         </button>
       </div>
@@ -104,7 +104,7 @@ export default function AIChatSidebar({ isOpen, onClose }: { isOpen: boolean; on
             <div className={`max-w-[80%] rounded-2xl p-3 leading-relaxed ${
               msg.sender === 'user' 
                 ? 'bg-sky-500 text-white rounded-tr-none' 
-                : 'bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-blue-950/40 rounded-tl-none'
+                : 'bg-slate-100  border border-slate-200  rounded-tl-none'
             }`}>
               {msg.text}
             </div>
@@ -114,7 +114,7 @@ export default function AIChatSidebar({ isOpen, onClose }: { isOpen: boolean; on
       </div>
 
       {/* Chat Input */}
-      <div className="p-4 border-t border-slate-200 dark:border-blue-950/40 bg-slate-50/50 dark:bg-slate-950/20">
+      <div className="p-4 border-t border-slate-200 bg-slate-50/50">
         <div className="flex space-x-2">
           <input
             type="text"
@@ -122,7 +122,7 @@ export default function AIChatSidebar({ isOpen, onClose }: { isOpen: boolean; on
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder={t('aiChatPlaceholder')}
-            className="flex-1 p-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-blue-950/40 rounded-xl text-xs outline-none focus:border-sky-500"
+            className="flex-1 p-2 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none focus:border-sky-500"
           />
           <button 
             onClick={handleSend}

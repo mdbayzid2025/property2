@@ -157,7 +157,7 @@ export default function EmployeeManager({ companyId }: { companyId: string }) {
       {/* Header section */}
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center space-x-3">
-          <div className="p-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl">
+          <div className="p-2.5 bg-indigo-500/10 text-indigo-600 rounded-xl">
             <Briefcase className="w-6 h-6" />
           </div>
           <div>

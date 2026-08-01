@@ -262,7 +262,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
       </div>
 
       {showAddForm && (
-        <form onSubmit={handleAddProperty} className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 grid grid-cols-1 md:grid-cols-4 gap-4 animate-slide-in">
+        <form onSubmit={handleAddProperty} className="glass-panel rounded-2xl p-5 border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-4 animate-slide-in">
           <div>
             <label className="text-xs text-slate-400 block mb-1">Property Name</label>
             <input
@@ -270,7 +270,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
               placeholder="e.g. Bongo Tower Phase-2"
               value={newPropName}
               onChange={(e) => setNewPropName(e.target.value)}
-              className="w-full p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-blue-950/40 rounded-xl text-xs outline-none"
+              className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none"
               required
             />
           </div>
@@ -279,7 +279,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
             <select
               value={newPropType}
               onChange={(e: any) => setNewPropType(e.target.value)}
-              className="w-full p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-blue-950/40 rounded-xl text-xs outline-none text-slate-300"
+              className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none text-slate-300"
             >
               <option value="residential">Residential Apartments</option>
               <option value="commercial">Commercial Buildings</option>
@@ -296,7 +296,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
               placeholder="e.g. ধানমন্ডি, ঢাকা"
               value={newPropAddress}
               onChange={(e) => setNewPropAddress(e.target.value)}
-              className="w-full p-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-blue-950/40 rounded-xl text-xs outline-none"
+              className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none"
               required
             />
           </div>
@@ -332,30 +332,30 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
           {/* Property Sidebar Details */}
-          <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 space-y-4">
-            <h3 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">{selectedProperty.name}</h3>
-            <div className="space-y-2 text-xs text-slate-500 dark:text-slate-400">
+          <div className="glass-panel rounded-2xl p-5 border border-slate-200 space-y-4">
+            <h3 className="font-extrabold text-sm text-slate-800">{selectedProperty.name}</h3>
+            <div className="space-y-2 text-xs text-slate-500">
               <div className="flex justify-between gap-2">
-                <span className="shrink-0 text-slate-450 dark:text-slate-500">Address:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-250 text-right">{selectedProperty.address}</span>
+                <span className="shrink-0 text-slate-450">Address:</span>
+                <span className="font-semibold text-slate-700 text-right">{selectedProperty.address}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-455 dark:text-slate-500">Floors:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-250">{selectedProperty.floors} Floors</span>
+                <span className="text-slate-455">Floors:</span>
+                <span className="font-semibold text-slate-700">{selectedProperty.floors} Floors</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-455 dark:text-slate-500">Units Managed:</span>
-                <span className="font-semibold text-slate-700 dark:text-slate-250">{propertyUnits.length} Units</span>
+                <span className="text-slate-455">Units Managed:</span>
+                <span className="font-semibold text-slate-700">{propertyUnits.length} Units</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-455 dark:text-slate-500">Status:</span>
+                <span className="text-slate-455">Status:</span>
                 <span className="text-emerald-500 font-semibold">{selectedProperty.status.toUpperCase()}</span>
               </div>
             </div>
-            <hr className="border-slate-200 dark:border-slate-800/80" />
+            <hr className="border-slate-200" />
             <div className="space-y-2">
-              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">Unit Status Legend</span>
-              <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-650 dark:text-slate-450">
+              <span className="text-xs font-semibold text-slate-700 block">Unit Status Legend</span>
+              <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-650">
                 <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Vacant</span>
                 <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-sky-500"></span> Occupied</span>
                 <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Sold</span>
@@ -367,15 +367,15 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
 
           {/* Unit Manager Grid and Filter */}
           <div className="lg:col-span-3 space-y-4">
-            <div className="flex flex-col md:flex-row gap-3 justify-between items-center bg-white dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200 dark:border-blue-900/30 shadow-sm animate-slide-in">
-              <div className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-950/40 px-3 py-2 rounded-xl w-full md:w-auto border border-slate-200 dark:border-slate-800/80 transition-all focus-within:border-sky-500/50">
-                <Search className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+            <div className="flex flex-col md:flex-row gap-3 justify-between items-center bg-white p-3 rounded-2xl border border-slate-200 shadow-sm animate-slide-in">
+              <div className="flex items-center space-x-2 bg-slate-50 px-3 py-2 rounded-xl w-full md:w-auto border border-slate-200 transition-all focus-within:border-sky-500/50">
+                <Search className="w-4 h-4 text-slate-400" />
                 <input
                   type="text"
                   placeholder={t('search')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="bg-transparent outline-none border-none text-xs text-slate-700 dark:text-slate-300 w-full placeholder-slate-400 dark:placeholder-slate-600"
+                  className="bg-transparent outline-none border-none text-xs text-slate-700 w-full placeholder-slate-400"
                 />
               </div>
 
@@ -383,14 +383,14 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 p-2 rounded-xl text-xs text-slate-750 dark:text-slate-300 outline-none w-full md:w-auto transition-all focus:border-sky-500/50"
+                  className="bg-slate-50 border border-slate-200 p-2 rounded-xl text-xs text-slate-750 outline-none w-full md:w-auto transition-all focus:border-sky-500/50"
                 >
-                  <option value="all" className="bg-white dark:bg-slate-900 text-slate-850 dark:text-slate-100">All Units (সব ইউনিট)</option>
-                  <option value="vacant" className="bg-white dark:bg-slate-900 text-slate-850 dark:text-slate-100">Vacant (ফাঁকা)</option>
-                  <option value="occupied" className="bg-white dark:bg-slate-900 text-slate-850 dark:text-slate-100">Occupied (ভাড়াটিয়া আছে)</option>
-                  <option value="sold" className="bg-white dark:bg-slate-900 text-slate-850 dark:text-slate-100">Sold (বিক্রি হয়েছে)</option>
-                  <option value="reserved" className="bg-white dark:bg-slate-900 text-slate-850 dark:text-slate-100">Reserved (বুকড)</option>
-                  <option value="maintenance" className="bg-white dark:bg-slate-900 text-slate-850 dark:text-slate-100">Maintenance (রক্ষণাবেক্ষণ)</option>
+                  <option value="all" className="bg-white text-slate-850">All Units (সব ইউনিট)</option>
+                  <option value="vacant" className="bg-white text-slate-850">Vacant (ফাঁকা)</option>
+                  <option value="occupied" className="bg-white text-slate-850">Occupied (ভাড়াটিয়া আছে)</option>
+                  <option value="sold" className="bg-white text-slate-850">Sold (বিক্রি হয়েছে)</option>
+                  <option value="reserved" className="bg-white text-slate-850">Reserved (বুকড)</option>
+                  <option value="maintenance" className="bg-white text-slate-850">Maintenance (রক্ষণাবেক্ষণ)</option>
                 </select>
 
                 <button
@@ -405,18 +405,18 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
 
             {showAddUnitForm && (
               <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-slide-in my-8">
+                <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-slide-in my-8">
                   {/* Header */}
-                  <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-850 flex justify-between items-center">
+                  <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
+                      <h3 className="text-base font-extrabold text-slate-900">
                         নতুন ইউনিট যোগ করুন (Add New Unit)
                       </h3>
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowAddUnitForm(false)}
-                      className="p-1.5 hover:bg-slate-150 dark:hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
+                      className="p-1.5 hover:bg-slate-150 rounded-xl text-slate-400 hover:text-slate-700 transition-all"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -432,7 +432,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                           placeholder="e.g. Flat C1"
                           value={newUnitNumber}
                           onChange={(e) => setNewUnitNumber(e.target.value)}
-                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                           required
                         />
                       </div>
@@ -442,7 +442,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                           type="number"
                           value={newUnitFloor}
                           onChange={(e) => setNewUnitFloor(Number(e.target.value))}
-                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                           required
                         />
                       </div>
@@ -451,7 +451,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                         <select
                           value={newUnitType}
                           onChange={(e: any) => setNewUnitType(e.target.value)}
-                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200 font-medium"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800 font-medium"
                         >
                           <option value="flat">Flat (বাসা)</option>
                           <option value="shop">Shop (দোকান)</option>
@@ -465,7 +465,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                           type="number"
                           value={newUnitSize}
                           onChange={(e) => setNewUnitSize(Number(e.target.value))}
-                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                           required
                         />
                       </div>
@@ -475,7 +475,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                           type="number"
                           value={newUnitRent}
                           onChange={(e) => setNewUnitRent(Number(e.target.value))}
-                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                           required
                         />
                       </div>
@@ -485,7 +485,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                           type="number"
                           value={newUnitService}
                           onChange={(e) => setNewUnitService(Number(e.target.value))}
-                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                           required
                         />
                       </div>
@@ -495,7 +495,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                           type="number"
                           value={newUnitDeposit}
                           onChange={(e) => setNewUnitDeposit(Number(e.target.value))}
-                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                           required
                         />
                       </div>
@@ -506,7 +506,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                           placeholder="e.g. E-882715"
                           value={newUnitMeter}
                           onChange={(e) => setNewUnitMeter(e.target.value)}
-                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                         />
                       </div>
                       {newUnitType === 'flat' && (
@@ -517,7 +517,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               type="number"
                               value={newUnitBedrooms}
                               onChange={(e) => setNewUnitBedrooms(Number(e.target.value))}
-                              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                             />
                           </div>
                           <div>
@@ -526,17 +526,17 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               type="number"
                               value={newUnitBathrooms}
                               onChange={(e) => setNewUnitBathrooms(Number(e.target.value))}
-                              className="w-full p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                             />
                           </div>
                         </>
                       )}
                     </div>
-                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                       <button
                         type="button"
                         onClick={() => setShowAddUnitForm(false)}
-                        className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl font-bold transition-all"
+                        className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all"
                       >
                         বাতিল (Cancel)
                       </button>
@@ -559,11 +559,11 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
               ) : (
                 filteredUnits.map((u) => {
                   const statusColors =
-                    u.status === 'vacant' ? 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5' :
-                      u.status === 'occupied' ? 'border-sky-500/30 text-sky-600 dark:text-sky-400 bg-sky-500/5' :
-                        u.status === 'sold' ? 'border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/5' :
-                          u.status === 'reserved' ? 'border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/5' :
-                            'border-rose-500/30 text-rose-600 dark:text-rose-400 bg-rose-500/5';
+                    u.status === 'vacant' ? 'border-emerald-500/30 text-emerald-600  bg-emerald-500/5' :
+                      u.status === 'occupied' ? 'border-sky-500/30 text-sky-600  bg-sky-500/5' :
+                        u.status === 'sold' ? 'border-purple-500/30 text-purple-600  bg-purple-500/5' :
+                          u.status === 'reserved' ? 'border-amber-500/30 text-amber-600  bg-amber-500/5' :
+                            'border-rose-500/30 text-rose-600  bg-rose-500/5';
 
                   return (
                     <div
@@ -572,15 +572,15 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                       className={`glass-panel border p-4 rounded-2xl flex flex-col justify-between h-36 relative transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer ${statusColors}`}
                     >
                       <div className="flex justify-between items-start">
-                        <span className="font-extrabold text-xs text-slate-800 dark:text-slate-200">{u.number}</span>
-                        <span className="text-[9px] font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400">{u.type}</span>
+                        <span className="font-extrabold text-xs text-slate-800">{u.number}</span>
+                        <span className="text-[9px] font-bold tracking-wider uppercase text-slate-500">{u.type}</span>
                       </div>
-                      <div className="space-y-1 mt-2 text-[10px] text-slate-600 dark:text-slate-450">
+                      <div className="space-y-1 mt-2 text-[10px] text-slate-600">
                         <p>{u.sizeSqft} Sqft • Floor {u.floor}</p>
                         {u.bedrooms && <p>{u.bedrooms} Beds / {u.bathrooms} Baths</p>}
-                        {u.rentAmount > 0 && <p className="font-extrabold text-slate-800 dark:text-slate-250">৳ {u.rentAmount.toLocaleString()} / mo</p>}
+                        {u.rentAmount > 0 && <p className="font-extrabold text-slate-800">৳ {u.rentAmount.toLocaleString()} / mo</p>}
                       </div>
-                      <div className="flex justify-between items-center mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-800/80">
+                      <div className="flex justify-between items-center mt-3 pt-2 border-t border-slate-200/60">
                         <span className="text-[9px] font-bold uppercase">{u.status}</span>
                         <button
                           onClick={(e) => {
@@ -605,26 +605,26 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
       {/* Unit Details & Tenant Management Modal */}
       {selectedUnitDetails && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden animate-slide-in my-8">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden animate-slide-in my-8">
 
             {/* Header */}
-            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-850 flex justify-between items-center">
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
+                <h3 className="text-base font-extrabold text-slate-900">
                   {selectedUnitDetails.number} - এর বিস্তারিত বিবরণ
                 </h3>
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${selectedUnitDetails.status === 'vacant' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/20' :
-                  selectedUnitDetails.status === 'occupied' ? 'bg-sky-500/10 text-sky-600 dark:text-sky-455 border-sky-500/20' :
-                    selectedUnitDetails.status === 'sold' ? 'bg-purple-500/10 text-purple-600 dark:text-purple-450 border-purple-500/20' :
-                      selectedUnitDetails.status === 'reserved' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-455 border-amber-500/20' :
-                        'bg-rose-500/10 text-rose-600 dark:text-rose-455 border-rose-500/20'
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${selectedUnitDetails.status === 'vacant' ? 'bg-emerald-500/10 text-emerald-600  border-emerald-500/20' :
+                  selectedUnitDetails.status === 'occupied' ? 'bg-sky-500/10 text-sky-600  border-sky-500/20' :
+                    selectedUnitDetails.status === 'sold' ? 'bg-purple-500/10 text-purple-600  border-purple-500/20' :
+                      selectedUnitDetails.status === 'reserved' ? 'bg-amber-500/10 text-amber-600  border-amber-500/20' :
+                        'bg-rose-500/10 text-rose-600  border-rose-500/20'
                   }`}>
                   {selectedUnitDetails.status}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedUnitDetails(null)}
-                className="p-1.5 hover:bg-slate-150 dark:hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
+                className="p-1.5 hover:bg-slate-150 rounded-xl text-slate-400 hover:text-slate-700 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -636,59 +636,59 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
               {/* Left Column: Specifications & Info */}
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
                     ফ্ল্যাট / ইউনিটের বিবরণ (Unit Specs)
                   </h4>
                   <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl">
-                      <span className="text-slate-400 dark:text-slate-500 block mb-0.5">প্রকার (Type)</span>
-                      <strong className="text-slate-700 dark:text-slate-200 capitalize font-extrabold">{selectedUnitDetails.type}</strong>
+                    <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-2xl">
+                      <span className="text-slate-400 block mb-0.5">প্রকার (Type)</span>
+                      <strong className="text-slate-700 capitalize font-extrabold">{selectedUnitDetails.type}</strong>
                     </div>
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl">
-                      <span className="text-slate-400 dark:text-slate-500 block mb-0.5">সাইজ (Size)</span>
-                      <strong className="text-slate-700 dark:text-slate-200 font-extrabold">{selectedUnitDetails.sizeSqft} Sqft</strong>
+                    <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-2xl">
+                      <span className="text-slate-400 block mb-0.5">সাইজ (Size)</span>
+                      <strong className="text-slate-700 font-extrabold">{selectedUnitDetails.sizeSqft} Sqft</strong>
                     </div>
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl">
-                      <span className="text-slate-400 dark:text-slate-500 block mb-0.5">তলা (Floor)</span>
-                      <strong className="text-slate-700 dark:text-slate-200 font-extrabold">Floor {selectedUnitDetails.floor}</strong>
+                    <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-2xl">
+                      <span className="text-slate-400 block mb-0.5">তলা (Floor)</span>
+                      <strong className="text-slate-700 font-extrabold">Floor {selectedUnitDetails.floor}</strong>
                     </div>
                     {selectedUnitDetails.bedrooms && (
-                      <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl">
-                        <span className="text-slate-400 dark:text-slate-500 block mb-0.5">রুম বিবরণ</span>
-                        <strong className="text-slate-700 dark:text-slate-200 font-extrabold">{selectedUnitDetails.bedrooms} Beds / {selectedUnitDetails.bathrooms} Baths</strong>
+                      <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-2xl">
+                        <span className="text-slate-400 block mb-0.5">রুম বিবরণ</span>
+                        <strong className="text-slate-700 font-extrabold">{selectedUnitDetails.bedrooms} Beds / {selectedUnitDetails.bathrooms} Baths</strong>
                       </div>
                     )}
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl">
-                      <span className="text-slate-400 dark:text-slate-500 block mb-0.5">ভাড়া (Monthly Rent)</span>
-                      <strong className="text-slate-700 dark:text-slate-200 font-extrabold">৳ {selectedUnitDetails.rentAmount.toLocaleString()}</strong>
+                    <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-2xl">
+                      <span className="text-slate-400 block mb-0.5">ভাড়া (Monthly Rent)</span>
+                      <strong className="text-slate-700 font-extrabold">৳ {selectedUnitDetails.rentAmount.toLocaleString()}</strong>
                     </div>
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl">
-                      <span className="text-slate-400 dark:text-slate-500 block mb-0.5">সার্ভিস চার্জ</span>
-                      <strong className="text-slate-700 dark:text-slate-200 font-extrabold">৳ {selectedUnitDetails.serviceCharge.toLocaleString()}</strong>
+                    <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-2xl">
+                      <span className="text-slate-400 block mb-0.5">সার্ভিস চার্জ</span>
+                      <strong className="text-slate-700 font-extrabold">৳ {selectedUnitDetails.serviceCharge.toLocaleString()}</strong>
                     </div>
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl col-span-2">
-                      <span className="text-slate-400 dark:text-slate-500 block mb-0.5">সিকিউরিটি ডিপোজিট</span>
-                      <strong className="text-slate-700 dark:text-slate-200 font-extrabold">৳ {selectedUnitDetails.securityDeposit.toLocaleString()}</strong>
+                    <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-2xl col-span-2">
+                      <span className="text-slate-400 block mb-0.5">সিকিউরিটি ডিপোজিট</span>
+                      <strong className="text-slate-700 font-extrabold">৳ {selectedUnitDetails.securityDeposit.toLocaleString()}</strong>
                     </div>
                     {selectedUnitDetails.meterNumber && (
-                      <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl col-span-2">
-                        <span className="text-slate-400 dark:text-slate-500 block mb-0.5">মিটার নম্বর (Utility Meter)</span>
-                        <strong className="text-slate-700 dark:text-slate-200 font-extrabold">{selectedUnitDetails.meterNumber}</strong>
+                      <div className="p-3 bg-slate-50 border border-slate-200/60 rounded-2xl col-span-2">
+                        <span className="text-slate-400 block mb-0.5">মিটার নম্বর (Utility Meter)</span>
+                        <strong className="text-slate-700 font-extrabold">{selectedUnitDetails.meterNumber}</strong>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 dark:bg-slate-950/25 border border-slate-200/80 dark:border-slate-800 rounded-2xl space-y-3">
-                  <h5 className="text-xs font-bold text-slate-700 dark:text-slate-300">অবস্থা পরিবর্তন করুন (Update Status)</h5>
+                <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3">
+                  <h5 className="text-xs font-bold text-slate-700">অবস্থা পরিবর্তন করুন (Update Status)</h5>
                   <div className="flex gap-2 flex-wrap">
                     {(['vacant', 'occupied', 'reserved', 'sold', 'maintenance'] as Unit['status'][]).map((st) => (
                       <button
                         key={st}
                         onClick={() => handleUpdateUnitStatus(selectedUnitDetails.id, st)}
                         className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border capitalize transition-all ${selectedUnitDetails.status === st
-                          ? 'border-sky-500 bg-sky-500/10 text-sky-600 dark:text-sky-400'
-                          : 'border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-850 hover:text-slate-700'
+                          ? 'border-sky-500 bg-sky-500/10 text-sky-600 '
+                          : 'border-slate-200  text-slate-500 hover:bg-slate-100  hover:text-slate-700'
                           }`}
                       >
                         {st}
@@ -700,8 +700,8 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                 {/* Danger Zone: Delete Unit */}
                 <div className="p-4 bg-rose-500/5 border border-rose-500/10 rounded-2xl flex justify-between items-center">
                   <div>
-                    <h5 className="text-xs font-bold text-rose-600 dark:text-rose-400">বিপদজনক অঞ্চল (Danger Zone)</h5>
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">এই ফ্ল্যাট/ইউনিটটি চিরতরে মুছে ফেলুন</p>
+                    <h5 className="text-xs font-bold text-rose-600">বিপদজনক অঞ্চল (Danger Zone)</h5>
+                    <p className="text-[10px] text-slate-400 mt-0.5">এই ফ্ল্যাট/ইউনিটটি চিরতরে মুছে ফেলুন</p>
                   </div>
                   <button
                     onClick={() => handleDeleteUnit(selectedUnitDetails.id)}
@@ -718,7 +718,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
               <div className="space-y-6">
 
                 {/* Onboarding & Checkout Panel */}
-                <div className="p-5 bg-slate-50 dark:bg-slate-950/20 border border-slate-200 dark:border-slate-800/80 rounded-2xl">
+                <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl">
                   {selectedUnitDetails.status === 'occupied' ? (
                     <div>
                       {(() => {
@@ -729,68 +729,68 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               <div className="flex justify-between items-start gap-2">
                                 <div>
                                   <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">বর্তমান ভাড়াটিয়া</span>
-                                  <h4 className="text-sm font-extrabold text-slate-800 dark:text-slate-200">{currentTenant.name}</h4>
+                                  <h4 className="text-sm font-extrabold text-slate-800">{currentTenant.name}</h4>
                                   <p className="text-xs text-slate-500">{currentTenant.occupation || 'পেশা উল্লেখ নেই'}</p>
                                 </div>
                                 <button
                                   onClick={() => handleCheckoutTenant(currentTenant.id, selectedUnitDetails.id)}
-                                  className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-455 rounded-xl text-[10px] font-bold flex items-center gap-1 transition-colors border border-rose-500/20 shrink-0"
+                                  className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 rounded-xl text-[10px] font-bold flex items-center gap-1 transition-colors border border-rose-500/20 shrink-0"
                                 >
                                   <LogOut className="w-3.5 h-3.5" />
                                   Checkout করুন
                                 </button>
                               </div>
-                              <div className="grid grid-cols-2 gap-3 text-xs pt-3 border-t border-slate-200/60 dark:border-slate-800/80">
+                              <div className="grid grid-cols-2 gap-3 text-xs pt-3 border-t border-slate-200/60">
                                 <div>
                                   <span className="text-slate-400 block text-[10px]">মোবাইল নম্বর</span>
-                                  <span className="text-slate-700 dark:text-slate-350 font-bold">{currentTenant.phone}</span>
+                                  <span className="text-slate-700 font-bold">{currentTenant.phone}</span>
                                 </div>
                                 {currentTenant.nid && (
                                   <div>
                                     <span className="text-slate-400 block text-[10px]">জাতীয় পরিচয়পত্র NID</span>
-                                    <span className="text-slate-700 dark:text-slate-350 font-bold">{currentTenant.nid}</span>
+                                    <span className="text-slate-700 font-bold">{currentTenant.nid}</span>
                                   </div>
                                 )}
                                 {currentTenant.email && (
                                   <div>
                                     <span className="text-slate-400 block text-[10px]">ইমেইল</span>
-                                    <span className="text-slate-700 dark:text-slate-350 font-medium overflow-hidden text-ellipsis block">{currentTenant.email}</span>
+                                    <span className="text-slate-700 font-medium overflow-hidden text-ellipsis block">{currentTenant.email}</span>
                                   </div>
                                 )}
                                 <div>
                                   <span className="text-slate-400 block text-[10px]">ভাড়ার শুরুর তারিখ</span>
-                                  <span className="text-slate-700 dark:text-slate-350 font-bold">{currentTenant.moveInDate}</span>
+                                  <span className="text-slate-700 font-bold">{currentTenant.moveInDate}</span>
                                 </div>
                                 <div className="col-span-2">
                                   <span className="text-slate-400 block text-[10px]">জরুরি যোগাযোগ</span>
-                                  <span className="text-slate-700 dark:text-slate-350">{currentTenant.emergencyContact || 'N/A'}</span>
+                                  <span className="text-slate-700">{currentTenant.emergencyContact || 'N/A'}</span>
                                 </div>
                               </div>
 
                               {/* Submitted Documents Section */}
-                              <div className="mt-4 pt-3 border-t border-slate-200/65 dark:border-slate-800/85">
+                              <div className="mt-4 pt-3 border-t border-slate-200/65">
                                 <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider mb-2">ভাড়াটিয়ার কাগজপত্র (Submitted Documents)</span>
                                 <div className="space-y-2">
                                   {currentTenant.documents && currentTenant.documents.length > 0 ? (
                                     currentTenant.documents.map((doc, idx) => (
-                                      <div key={idx} className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl flex justify-between items-center text-xs">
-                                        <span className="font-semibold text-slate-700 dark:text-slate-350">{doc.name} ({doc.size})</span>
+                                      <div key={idx} className="p-2.5 bg-white border border-slate-200 rounded-xl flex justify-between items-center text-xs">
+                                        <span className="font-semibold text-slate-700">{doc.name} ({doc.size})</span>
                                         <button
                                           type="button"
                                           onClick={() => handleViewDoc(doc, currentTenant)}
-                                          className="px-2.5 py-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 rounded-lg font-bold text-[10px] transition-colors"
+                                          className="px-2.5 py-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 rounded-lg font-bold text-[10px] transition-colors"
                                         >
                                           দেখুন (View)
                                         </button>
                                       </div>
                                     ))
                                   ) : (
-                                    <div className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl flex justify-between items-center text-xs">
-                                      <span className="font-semibold text-slate-700 dark:text-slate-300">Rental Agreement Deed.pdf (1.2 MB)</span>
+                                    <div className="p-2.5 bg-white border border-slate-200 rounded-xl flex justify-between items-center text-xs">
+                                      <span className="font-semibold text-slate-700">Rental Agreement Deed.pdf (1.2 MB)</span>
                                       <button
                                         type="button"
                                         onClick={() => handleViewDoc({ name: 'Rental Agreement Deed.pdf', size: '1.2 MB', type: 'application/pdf' }, currentTenant)}
-                                        className="px-2.5 py-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 rounded-lg font-bold text-[10px] transition-colors"
+                                        className="px-2.5 py-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 rounded-lg font-bold text-[10px] transition-colors"
                                       >
                                         দেখুন (View)
                                       </button>
@@ -806,7 +806,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               <p>ফ্ল্যাটের অবস্থা "Occupied" কিন্তু সক্রিয় কোনো ভাড়াটিয়া পাওয়া যায়নি।</p>
                               <button
                                 onClick={() => handleUpdateUnitStatus(selectedUnitDetails.id, 'vacant')}
-                                className="px-3.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 rounded-xl text-xs font-bold"
+                                className="px-3.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 border border-emerald-500/20 rounded-xl text-xs font-bold"
                               >
                                 অবস্থা "Vacant" করুন
                               </button>
@@ -827,7 +827,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               placeholder="যেমন: মোঃ সাকিব হাসান"
                               value={newTenantName}
                               onChange={(e) => setNewTenantName(e.target.value)}
-                              className="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                               required
                             />
                           </div>
@@ -838,7 +838,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               placeholder="যেমন: 017XXXXXXXX"
                               value={newTenantPhone}
                               onChange={(e) => setNewTenantPhone(e.target.value)}
-                              className="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                               required
                             />
                           </div>
@@ -849,16 +849,16 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               placeholder="যেমন: বেসরকারি চাকরি"
                               value={newTenantOccupation}
                               onChange={(e) => setNewTenantOccupation(e.target.value)}
-                              className="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                             />
                           </div>
                           <div className="col-span-2">
                             <label className="text-[10px] text-slate-500 block mb-1">প্রয়োজনীয় ডকুমেন্টস (ছবি বা ফাইল আপলোড)</label>
                             <div className="flex flex-col gap-2.5">
                               {/* Drag & drop / Select file zone */}
-                              <label className="w-full py-4 border border-dashed border-slate-300 dark:border-slate-800 hover:border-sky-500 dark:hover:border-sky-500 bg-slate-50/50 dark:bg-slate-950/10 rounded-2xl flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-slate-100/50">
+                              <label className="w-full py-4 border border-dashed border-slate-300 hover:border-sky-500 bg-slate-50/50 rounded-2xl flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-all hover:bg-slate-100/50">
                                 <Upload className="w-5 h-5 text-slate-400" />
-                                <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">ডকুমেন্ট / ছবি আপলোড করুন</span>
+                                <span className="text-[10px] font-bold text-slate-600">ডকুমেন্ট / ছবি আপলোড করুন</span>
                                 <input
                                   type="file"
                                   multiple
@@ -887,8 +887,8 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               {newTenantDocs.length > 0 && (
                                 <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto pr-1">
                                   {newTenantDocs.map((doc, idx) => (
-                                    <div key={idx} className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl flex justify-between items-center text-[10px] gap-1.5">
-                                      <span className="font-semibold text-slate-600 dark:text-slate-350 truncate flex-1">{doc.name}</span>
+                                    <div key={idx} className="p-2 bg-white border border-slate-200 rounded-xl flex justify-between items-center text-[10px] gap-1.5">
+                                      <span className="font-semibold text-slate-600 truncate flex-1">{doc.name}</span>
                                       <button
                                         type="button"
                                         onClick={() => setNewTenantDocs(prev => prev.filter((_, i) => i !== idx))}
@@ -908,7 +908,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               type="date"
                               value={newTenantMoveInDate}
                               onChange={(e) => setNewTenantMoveInDate(e.target.value)}
-                              className="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                               required
                             />
                           </div>
@@ -919,7 +919,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                               placeholder="মোবাইল ও সম্পর্কের বিবরণ (যেমন: ০১৭০০-০০০০০০ - ভাই)"
                               value={newTenantEmergency}
                               onChange={(e) => setNewTenantEmergency(e.target.value)}
-                              className="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+                              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none text-slate-800"
                             />
                           </div>
                         </div>
@@ -941,7 +941,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <History className="w-4 h-4 text-purple-400" />
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-350 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                       ভাড়াটিয়া ইতিহাস সংরক্ষণাগার (Timeline)
                     </h4>
                   </div>
@@ -950,7 +950,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                       const history = getTenantHistoryForUnit(selectedUnitDetails.id);
                       if (history.length === 0) {
                         return (
-                          <div className="py-5 text-center text-[10px] text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-950/10 border border-slate-200/50 dark:border-slate-800/80 rounded-2xl">
+                          <div className="py-5 text-center text-[10px] text-slate-400 bg-slate-50 border border-slate-200/50 rounded-2xl">
                             পূর্বে কোনো ভাড়াটিয়া থাকার ইতিহাস রেকর্ড নেই।
                           </div>
                         );
@@ -962,23 +962,23 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                             key={h.id}
                             className={`p-3 border rounded-2xl flex justify-between items-center text-xs transition-all ${isActive
                               ? 'border-sky-500 bg-sky-500/5'
-                              : 'border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/40 text-slate-650'
+                              : 'border-slate-200  bg-white  text-slate-650'
                               }`}
                           >
                             <div>
                               <div className="flex items-center gap-2">
-                                <strong className="text-slate-800 dark:text-slate-250 font-extrabold">{h.name}</strong>
-                                <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase ${isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                                <strong className="text-slate-800 font-extrabold">{h.name}</strong>
+                                <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase ${isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-100  text-slate-500'
                                   }`}>
                                   {isActive ? 'সক্রিয়' : 'পূর্বের'}
                                 </span>
                               </div>
                               <p className="text-[10px] text-slate-550 mt-0.5 font-medium">মোবাইল: {h.phone}</p>
-                              <p className="text-[9px] text-slate-455 dark:text-slate-500 mt-0.5 font-medium">
+                              <p className="text-[9px] text-slate-455 mt-0.5 font-medium">
                                 সময়কাল: {h.moveInDate} থেকে {h.moveOutDate || 'বর্তমান'}
                               </p>
                             </div>
-                            <span className="text-[10px] text-slate-550 dark:text-slate-450 font-medium">
+                            <span className="text-[10px] text-slate-550 font-medium">
                               {h.occupation}
                             </span>
                           </div>
@@ -998,13 +998,13 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
       {/* Document Viewer Modal Overlay */}
       {viewingSelectedDoc && viewingDocTenant && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-[60] p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-slide-in my-8 p-6 space-y-6 flex flex-col">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-slide-in my-8 p-6 space-y-6 flex flex-col">
 
             {/* Header */}
-            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3 w-full">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3 w-full">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-sky-500" />
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
+                <h3 className="text-base font-extrabold text-slate-900">
                   {viewingSelectedDoc.name} ({viewingSelectedDoc.size})
                 </h3>
               </div>
@@ -1013,7 +1013,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                   setViewingSelectedDoc(null);
                   setViewingDocTenant(null);
                 }}
-                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
+                className="p-1.5 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-slate-700 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1022,7 +1022,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
             {/* Document Render Area */}
             <div className="flex-1 flex justify-center py-4 overflow-y-auto max-h-[60vh] w-full">
               {viewingSelectedDoc.previewUrl && viewingSelectedDoc.type.startsWith('image/') ? (
-                <div className="flex flex-col items-center justify-center p-2 bg-slate-50 dark:bg-slate-950/20 border border-slate-200 dark:border-slate-800/80 rounded-3xl max-w-lg w-full">
+                <div className="flex flex-col items-center justify-center p-2 bg-slate-50 border border-slate-200 rounded-3xl max-w-lg w-full">
                   <img
                     src={viewingSelectedDoc.previewUrl}
                     alt={viewingSelectedDoc.name}
@@ -1033,21 +1033,21 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
               ) : viewingSelectedDoc.name.toLowerCase().includes('nid') ? (
                 <div className="space-y-6 w-full max-w-md">
                   {/* Front Side of NID */}
-                  <div className="bg-gradient-to-br from-emerald-50/80 to-emerald-100/30 dark:from-emerald-950/20 dark:to-slate-900 border border-emerald-500/20 rounded-2xl p-4 relative shadow-md flex flex-col justify-between h-56 text-slate-800 dark:text-slate-200 select-none">
+                  <div className="bg-gradient-to-br from-emerald-50/80 to-emerald-100/30 border border-emerald-500/20 rounded-2xl p-4 relative shadow-md flex flex-col justify-between h-56 text-slate-800 select-none">
                     {/* Top crest header */}
                     <div className="flex justify-between items-start gap-2 border-b border-emerald-500/20 pb-1.5">
                       <div className="w-7 h-7 bg-emerald-700 text-white rounded-full flex items-center justify-center text-[10px] font-black shrink-0 border border-emerald-500/20 shadow-sm">BD</div>
                       <div className="text-center flex-1">
-                        <span className="text-[8px] font-bold block text-emerald-800 dark:text-emerald-400">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</span>
+                        <span className="text-[8px] font-bold block text-emerald-800">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</span>
                         <span className="text-[7px] font-semibold block text-slate-500">Government of the People's Republic of Bangladesh</span>
-                        <span className="text-[9px] font-black block tracking-wide text-emerald-900 dark:text-emerald-300">National ID Card / জাতীয় পরিচয়পত্র</span>
+                        <span className="text-[9px] font-black block tracking-wide text-emerald-900">National ID Card / জাতীয় পরিচয়পত্র</span>
                       </div>
                       <div className="w-7 h-7 bg-slate-250 rounded-full flex items-center justify-center shrink-0 border border-emerald-500/10">🇧🇩</div>
                     </div>
                     {/* Card Content body */}
                     <div className="flex gap-3 flex-1 mt-2">
                       <div className="w-20 flex flex-col justify-between items-center py-1">
-                        <div className="w-16 h-20 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-600 shadow-sm relative overflow-hidden">
+                        <div className="w-16 h-20 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center text-slate-400 shadow-sm relative overflow-hidden">
                           <User className="w-10 h-10" />
                           <div className="absolute inset-0 bg-sky-500/10"></div>
                         </div>
@@ -1055,50 +1055,50 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                       </div>
                       <div className="flex-1 space-y-1.5 text-[9px] leading-tight mt-1">
                         <div>
-                          <span className="text-slate-400 dark:text-slate-500 block text-[7px]">নাম (Name):</span>
-                          <strong className="text-slate-800 dark:text-slate-100 font-extrabold text-[10px] block">{viewingDocTenant.name}</strong>
+                          <span className="text-slate-400 block text-[7px]">নাম (Name):</span>
+                          <strong className="text-slate-800 font-extrabold text-[10px] block">{viewingDocTenant.name}</strong>
                         </div>
                         <div>
-                          <span className="text-slate-450 dark:text-slate-500 block text-[7px]">পিতা (Father):</span>
-                          <span className="text-slate-700 dark:text-slate-200 font-bold block">মোঃ আব্দুল হালিম চৌধুরী</span>
+                          <span className="text-slate-450 block text-[7px]">পিতা (Father):</span>
+                          <span className="text-slate-700 font-bold block">মোঃ আব্দুল হালিম চৌধুরী</span>
                         </div>
                         <div>
-                          <span className="text-slate-450 dark:text-slate-500 block text-[7px]">মাতা (Mother):</span>
-                          <span className="text-slate-700 dark:text-slate-200 font-bold block">মোছাঃ রাশিদা বেগম</span>
+                          <span className="text-slate-450 block text-[7px]">মাতা (Mother):</span>
+                          <span className="text-slate-700 font-bold block">মোছাঃ রাশিদা বেগম</span>
                         </div>
                         <div className="flex justify-between gap-1">
                           <div>
-                            <span className="text-slate-450 dark:text-slate-500 block text-[7px]">জন্ম তারিখ (Date of Birth):</span>
-                            <span className="text-slate-700 dark:text-slate-200 font-bold block">15 Jun 1986</span>
+                            <span className="text-slate-450 block text-[7px]">জন্ম তারিখ (Date of Birth):</span>
+                            <span className="text-slate-700 font-bold block">15 Jun 1986</span>
                           </div>
                           <div>
-                            <span className="text-slate-450 dark:text-slate-500 block text-[7px]">রক্তের গ্রুপ:</span>
+                            <span className="text-slate-450 block text-[7px]">রক্তের গ্রুপ:</span>
                             <span className="text-rose-500 font-bold block">O+</span>
                           </div>
                         </div>
                         <div className="pt-1 border-t border-emerald-500/10">
-                          <span className="text-slate-450 dark:text-slate-500 block text-[7px] font-black">NID NO:</span>
-                          <span className="text-emerald-700 dark:text-emerald-400 text-[11px] font-black tracking-widest block">{viewingDocTenant.nid || '3829102938210'}</span>
+                          <span className="text-slate-450 block text-[7px] font-black">NID NO:</span>
+                          <span className="text-emerald-700 text-[11px] font-black tracking-widest block">{viewingDocTenant.nid || '3829102938210'}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Back Side of NID */}
-                  <div className="bg-gradient-to-br from-emerald-50/80 to-emerald-100/30 dark:from-emerald-950/20 dark:to-slate-900 border border-emerald-500/20 rounded-2xl p-4 relative shadow-md flex flex-col justify-between h-56 text-slate-800 dark:text-slate-200 select-none">
+                  <div className="bg-gradient-to-br from-emerald-50/80 to-emerald-100/30 border border-emerald-500/20 rounded-2xl p-4 relative shadow-md flex flex-col justify-between h-56 text-slate-800 select-none">
                     <div className="space-y-2 text-[8px] flex-1">
                       <div className="border-b border-emerald-500/20 pb-1">
-                        <span className="font-bold text-emerald-800 dark:text-emerald-450 text-[7px] block uppercase">Address / ঠিকানা:</span>
-                        <p className="text-slate-700 dark:text-slate-200 font-semibold">{selectedProperty?.address}, ডাকঘর: ধানমন্ডি - ১২০৯, ঢাকা মেট্রোপলিটন</p>
+                        <span className="font-bold text-emerald-800 text-[7px] block uppercase">Address / ঠিকানা:</span>
+                        <p className="text-slate-700 font-semibold">{selectedProperty?.address}, ডাকঘর: ধানমন্ডি - ১২০৯, ঢাকা মেট্রোপলিটন</p>
                       </div>
                       <div className="flex justify-between gap-2">
                         <div>
-                          <span className="text-slate-455 dark:text-slate-500 text-[7px] block">প্রদানের স্থান:</span>
-                          <span className="text-slate-700 dark:text-slate-200 font-bold">ঢাকা</span>
+                          <span className="text-slate-455 text-[7px] block">প্রদানের স্থান:</span>
+                          <span className="text-slate-700 font-bold">ঢাকা</span>
                         </div>
                         <div>
-                          <span className="text-slate-455 dark:text-slate-500 text-[7px] block">প্রদানের তারিখ:</span>
-                          <span className="text-slate-700 dark:text-slate-200 font-bold">12 Jan 2018</span>
+                          <span className="text-slate-455 text-[7px] block">প্রদানের তারিখ:</span>
+                          <span className="text-slate-700 font-bold">12 Jan 2018</span>
                         </div>
                       </div>
 
@@ -1125,9 +1125,9 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                 </div>
               ) : (
                 /* Rental Deed Mockup */
-                <div className="bg-orange-50/15 dark:bg-slate-900 border-t-[14px] border-emerald-700 border-x border-b border-slate-200 dark:border-slate-800 rounded-b-2xl p-6 space-y-5 w-full max-w-lg shadow-lg relative text-slate-800 dark:text-slate-250 font-serif leading-relaxed text-xs">
+                <div className="bg-orange-50/15 border-t-[14px] border-emerald-700 border-x border-b border-slate-200 rounded-b-2xl p-6 space-y-5 w-full max-w-lg shadow-lg relative text-slate-800 font-serif leading-relaxed text-xs">
                   {/* Stamp Seal Mockup */}
-                  <div className="border border-dashed border-emerald-700/40 p-3 rounded-xl flex flex-col items-center justify-center space-y-1 text-emerald-800 dark:text-emerald-400 select-none">
+                  <div className="border border-dashed border-emerald-700/40 p-3 rounded-xl flex flex-col items-center justify-center space-y-1 text-emerald-800 select-none">
                     <span className="text-[14px] tracking-widest font-black block uppercase">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</span>
                     <div className="w-10 h-10 border border-emerald-700 rounded-full flex items-center justify-center font-black text-xs">১০০</div>
                     <span className="text-[9px] font-black block tracking-widest uppercase">একশত টাকা (১০০/-)</span>
@@ -1136,7 +1136,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
 
                   {/* Title of agreement */}
                   <div className="text-center font-bold tracking-wider pt-2">
-                    <h4 className="text-[13px] font-black text-slate-900 dark:text-slate-100 uppercase underline">অস্থায়ী ফ্ল্যাট/দোকান ভাড়া চুক্তিপত্র দলিল</h4>
+                    <h4 className="text-[13px] font-black text-slate-900 uppercase underline">অস্থায়ী ফ্ল্যাট/দোকান ভাড়া চুক্তিপত্র দলিল</h4>
                   </div>
 
                   <div className="space-y-3 text-[11px] font-sans">
@@ -1150,10 +1150,10 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                       উভয় পক্ষ স্বেচ্ছায় রাজী হইয়া অত্র ফ্ল্যাট/ইউনিট <strong>{selectedUnitDetails?.number}</strong> ভাড়ার নিম্নোক্ত চুক্তিনামায় স্বাক্ষর করিলেন:
                     </p>
 
-                    <div className="p-3 bg-white dark:bg-slate-950/20 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1.5 font-bold text-slate-700 dark:text-slate-350">
+                    <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1.5 font-bold text-slate-700">
                       <div className="flex justify-between">
                         <span>১. ফ্ল্যাট নম্বর:</span>
-                        <span className="text-sky-600 dark:text-sky-400">{selectedUnitDetails?.number}</span>
+                        <span className="text-sky-600">{selectedUnitDetails?.number}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>২. মাসিক ভাড়া:</span>
@@ -1169,7 +1169,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                       </div>
                     </div>
 
-                    <ul className="list-decimal pl-4 space-y-1 text-[10px] text-slate-600 dark:text-slate-400">
+                    <ul className="list-decimal pl-4 space-y-1 text-[10px] text-slate-600">
                       <li>প্রতি ইংরেজি মাসের ১০ তারিখের মধ্যে ২য় পক্ষকে অত্র ইউনিটের মাসিক ভাড়া ১ম পক্ষকে পরিশোধ করিতে হইবে।</li>
                       <li>বিদ্যুৎ, গ্যাস ও পানি বিল সহ অন্যান্য ইউটিলিটি বিল ২য় পক্ষ স্বীয় দায়িত্বে বহন করিবেন।</li>
                       <li>২য় পক্ষ অত্র ইউনিট কেবল আবাসিক/দাপ্তরিক কার্যে ব্যবহার করিবেন, কোনরূপ অসামাজিক বা অবৈধ কার্যে ব্যবহার করিতে পারিবেন না।</li>
@@ -1177,7 +1177,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
                   </div>
 
                   {/* Signatures */}
-                  <div className="flex justify-between pt-6 font-sans text-[10px] text-slate-650 dark:text-slate-455 select-none">
+                  <div className="flex justify-between pt-6 font-sans text-[10px] text-slate-650 select-none">
                     <div className="text-center w-24">
                       <div className="h-8 flex items-end justify-center font-mono italic text-[9px] text-sky-500 border-b border-dashed border-slate-300 pb-0.5">Manager.BP</div>
                       <span className="block font-bold mt-1">১ম পক্ষ (মালিক)</span>
@@ -1192,13 +1192,13 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
             </div>
 
             {/* Footer action */}
-            <div className="border-t border-slate-100 dark:border-slate-800 pt-4 flex justify-end w-full">
+            <div className="border-t border-slate-100 pt-4 flex justify-end w-full">
               <button
                 onClick={() => {
                   setViewingSelectedDoc(null);
                   setViewingDocTenant(null);
                 }}
-                className="px-5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-all shadow-md"
+                className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-md"
               >
                 বন্ধ করুন (Close)
               </button>

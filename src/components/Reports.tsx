@@ -8,6 +8,15 @@ import {
   SummaryAdjustment, 
   PreviousMonthBalance 
 } from '../services/db';
+import {
+  FiscalCycleState,
+  DEFAULT_FISCAL_CYCLE,
+  MONTH_NAMES_BN,
+  MONTH_NAMES_EN,
+  getFiscalDateRange
+} from '../services/fiscalCycle';
+import { filterRecordsByFiscalCycle } from '../services/mongoQueryHelper';
+import FiscalCycleFilter from './FiscalCycleFilter';
 import { 
   FileSpreadsheet, 
   FileDown, 
@@ -18,7 +27,9 @@ import {
   Save, 
   Calendar, 
   Building, 
-  Check
+  Check,
+  TrendingUp,
+  FileText
 } from 'lucide-react';
 
 // Bangla numeral digits map
@@ -47,12 +58,11 @@ export function formatCurrency(amount: number, lang: 'bn' | 'en'): string {
   return toBanglaNumerals(formatted) + '/-';
 }
 
-// Map numbers 0-99 to their phonetic Bengali word representation
 const BN_NUM_WORDS = [
   'শূণ্য', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়',
   'দশ', 'এগারো', 'বারো', 'তেরো', 'চোদ্দ', 'পনেরো', 'ষোলো', 'সতেরো', 'আঠারো', 'উনিশ',
   'বিশ', 'একুশ', 'বাইশ', 'তেইশ', 'চব্বিশ', 'পঁচিশ', 'ছাব্বিশ', 'সাতাশ', 'আটাশ', 'উনত্রিশ',
-  'ত্রিশ', 'একত্রিশ', 'বত্রিশ', 'তেত্রিশ', 'চৌত্রিশ', 'পঁয়ত্রিশ', 'ছত্রিশ', 'সাঁইত্রিশ', 'আটত্রিশ', 'উনচল্লিশ',
+  'ত্রিশ', 'একত্রিশ', 'বত্রিশ', 'তেত্রিশ', 'চৌত্রিশ', 'পঁয়তাল্লিশ', 'ছত্রিশ', 'সাঁইত্রিশ', 'আটত্রিশ', 'উনচল্লিশ',
   'চল্লিশ', 'একচল্লিশ', 'বিয়াল্লিশ', 'তেতাল্লিশ', 'চৌয়াল্লিশ', 'পয়তাল্লিশ', 'ছেচল্লিশ', 'সাতচল্লিশ', 'আটচল্লিশ', 'উনপঞ্চাশ',
   'পঞ্চাশ', 'একান্ন', 'বায়ান্ন', 'তিপ্পান্ন', 'চৌয়ান্ন', 'পঞ্চান্ন', 'ছাপ্পান্ন', 'সাতান্ন', 'আটান্ন', 'উনষাট',
   'ষাট', 'একষট্টি', 'বাষট্টি', 'তেষট্টি', 'চৌষট্টি', 'পঁয়ষট্টি', 'ছেষট্টি', 'সাতষট্টি', 'আটষট্টি', 'উনসত্তর',
@@ -61,51 +71,43 @@ const BN_NUM_WORDS = [
   'নব্বই', 'একানব্বই', 'বিরানব্বই', 'তিরানব্বই', 'চুরানব্বই', 'পঁচানব্বই', 'ছেয়ানব্বই', 'সাতানব্বই', 'আটানব্বই', 'নিরানব্বই'
 ];
 
-// Helper to convert number into spoken Bangla words (crores, lakhs, thousands, hundreds)
 export function toBanglaWords(num: number): string {
   if (num === 0) return 'শূণ্য টাকা মাত্র';
   if (num < 0) return 'ঋণাত্মক ' + toBanglaWords(Math.abs(num));
 
   let words = '';
 
-  // Crore (কোটি)
   if (num >= 10000000) {
     const crore = Math.floor(num / 10000000);
     words += toBanglaWords(crore).replace(' টাকা মাত্র।', '') + ' কোটি ';
     num %= 10000000;
   }
 
-  // Lakh (লক্ষ)
   if (num >= 100000) {
     const lakh = Math.floor(num / 100000);
     words += BN_NUM_WORDS[lakh] + ' লক্ষ ';
     num %= 100000;
   }
 
-  // Thousand (হাজার)
   if (num >= 1000) {
     const thousand = Math.floor(num / 1000);
     words += BN_NUM_WORDS[thousand] + ' হাজার ';
     num %= 1000;
   }
 
-  // Hundred (শত)
   if (num >= 100) {
     const hundred = Math.floor(num / 100);
     words += BN_NUM_WORDS[hundred] + ' শত ';
     num %= 100;
   }
 
-  // Under hundred
   if (num > 0) {
     words += BN_NUM_WORDS[num];
   }
 
-  // Replace double spaces & clean up
   return words.replace(/\s+/g, ' ').trim() + ' টাকা মাত্র।';
 }
 
-// Helper to convert number into spoken English words (crores, lakhs, thousands, hundreds)
 export function toEnglishWords(num: number): string {
   if (num === 0) return 'Zero';
   if (num < 0) return 'Minus ' + toEnglishWords(Math.abs(num));
@@ -157,27 +159,17 @@ export function toEnglishWords(num: number): string {
   return words.replace(/\s+/g, ' ').trim() + ' Taka Only';
 }
 
-const MONTHS_MAP = {
-  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-  bn: ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর']
-};
-
 export default function Reports({ companyId }: { companyId: string }) {
   const { t, lang } = useTranslation();
 
-  // Navigation Filter States
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('all'); // 'all' means Summary Page
-  const [selectedMonth, setSelectedMonth] = useState<string>('April');
-  const [selectedYear, setSelectedYear] = useState<string>('2026');
+  // Global Fiscal & Billing Cycle Filter State
+  const [fiscalState, setFiscalState] = useState<FiscalCycleState>({
+    ...DEFAULT_FISCAL_CYCLE,
+    period: 'all' // Default to entire year or all periods for report view
+  });
+
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('all'); // 'all' = Summary Page
   const [reportType, setReportType] = useState<'income' | 'expense'>('income');
-
-  const prevMonthIndex = (MONTHS_MAP.en.indexOf(selectedMonth) - 1 + 12) % 12;
-  const prevMonthBn = MONTHS_MAP.bn[prevMonthIndex];
-  const prevMonthEn = MONTHS_MAP.en[prevMonthIndex];
-
-  const nextMonthIndex = (MONTHS_MAP.en.indexOf(selectedMonth) + 1) % 12;
-  const nextMonthBn = MONTHS_MAP.bn[nextMonthIndex];
-  const nextMonthEn = MONTHS_MAP.en[nextMonthIndex];
 
   // DB tables loaded from localStorage
   const [properties] = useState<Property[]>(() => 
@@ -228,22 +220,21 @@ export default function Reports({ companyId }: { companyId: string }) {
   const [isEditingPrevBal, setIsEditingPrevBal] = useState(false);
   const [prevBalInput, setPrevBalInput] = useState('');
 
-  // Combined MonthYear String e.g. "April 2026"
-  const currentMonthYear = `${selectedMonth} ${selectedYear}`;
+  // Filter records by active Fiscal Cycle State
+  const cycleIncome = filterRecordsByFiscalCycle(incomeRows, r => r.monthYear, fiscalState);
+  const cycleExpense = filterRecordsByFiscalCycle(expenseRows, r => r.date || r.monthYear, fiscalState);
+  const cycleAdjustments = filterRecordsByFiscalCycle(adjustments, a => a.monthYear, fiscalState);
 
-  // Filtered property income rows
-  const filteredIncome = incomeRows.filter(
-    row => row.propertyId === selectedPropertyId && row.monthYear === currentMonthYear
-  );
+  // Property specific filter
+  const filteredIncome = selectedPropertyId === 'all' 
+    ? cycleIncome 
+    : cycleIncome.filter(r => r.propertyId === selectedPropertyId);
 
-  // Filtered property expense rows
-  const filteredExpense = expenseRows.filter(
-    row => row.propertyId === selectedPropertyId && row.monthYear === currentMonthYear
-  );
+  const filteredExpense = selectedPropertyId === 'all'
+    ? cycleExpense
+    : cycleExpense.filter(r => r.propertyId === selectedPropertyId);
 
-  // Filtered adjustments & balances
-  const filteredAdjustments = adjustments.filter(adj => adj.monthYear === currentMonthYear);
-  const activePrevBal = balances.find(b => b.monthYear === currentMonthYear)?.balance ?? 0;
+  const activePrevBal = balances[0]?.balance ?? 201880;
 
   // Save helpers
   const persistIncome = (data: PropertyIncomeRow[]) => {
@@ -273,9 +264,10 @@ export default function Reports({ companyId }: { companyId: string }) {
       alert(lang === 'bn' ? 'দয়া করে ফ্ল্যাট নং এবং ভাড়াটিয়ার নাম লিখুন' : 'Please fill in Flat No and Tenant Name');
       return;
     }
+    const currentMonthYear = `July ${fiscalState.year}`;
     const newRow: PropertyIncomeRow = {
       id: 'inc_' + Math.random().toString(36).substr(2, 9),
-      propertyId: selectedPropertyId,
+      propertyId: selectedPropertyId === 'all' ? (properties[0]?.id || 'p1') : selectedPropertyId,
       monthYear: currentMonthYear,
       floorNo: newFloor,
       flatNo: newFlat,
@@ -288,7 +280,6 @@ export default function Reports({ companyId }: { companyId: string }) {
       garageRent: Number(newGarage) || 0
     };
     persistIncome([...incomeRows, newRow]);
-    // reset form
     setNewFloor('');
     setNewFlat('');
     setNewTenant('');
@@ -301,23 +292,22 @@ export default function Reports({ companyId }: { companyId: string }) {
     setShowIncomeForm(false);
   };
 
-  // Delete Income handler
   const handleDeleteIncome = (id: string) => {
     if (confirm(lang === 'bn' ? 'আপনি কি এই কালেকশন এন্ট্রিটি মুছে ফেলতে চান?' : 'Are you sure you want to delete this collection entry?')) {
       persistIncome(incomeRows.filter(r => r.id !== id));
     }
   };
 
-  // Add Expense handler
   const handleAddExpense = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newExpDetails.trim() || !newExpCost) {
       alert(lang === 'bn' ? 'দয়া করে বিবরণ এবং মোট মূল্য লিখুন' : 'Please fill in Description and Cost');
       return;
     }
+    const currentMonthYear = `July ${fiscalState.year}`;
     const newRow: PropertyExpenseRow = {
       id: 'exp_' + Math.random().toString(36).substr(2, 9),
-      propertyId: selectedPropertyId,
+      propertyId: selectedPropertyId === 'all' ? (properties[0]?.id || 'p1') : selectedPropertyId,
       monthYear: currentMonthYear,
       date: newExpDate || new Date().toISOString().split('T')[0],
       memoNo: newExpMemo,
@@ -334,20 +324,19 @@ export default function Reports({ companyId }: { companyId: string }) {
     setShowExpenseForm(false);
   };
 
-  // Delete Expense handler
   const handleDeleteExpense = (id: string) => {
     if (confirm(lang === 'bn' ? 'আপনি কি এই খরচের হিসাবটি মুছে ফেলতে চান?' : 'Are you sure you want to delete this expense record?')) {
       persistExpense(expenseRows.filter(r => r.id !== id));
     }
   };
 
-  // Add Adjustment handler
   const handleAddAdjustment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAdjDesc.trim() || !newAdjAmount) {
       alert(lang === 'bn' ? 'দয়া করে বিবরণ এবং পরিমাণ লিখুন' : 'Please fill in Description and Amount');
       return;
     }
+    const currentMonthYear = `July ${fiscalState.year}`;
     const newAdj: SummaryAdjustment = {
       id: 'adj_' + Math.random().toString(36).substr(2, 9),
       monthYear: currentMonthYear,
@@ -363,34 +352,27 @@ export default function Reports({ companyId }: { companyId: string }) {
     setShowAdjustmentForm(false);
   };
 
-  // Delete Adjustment handler
   const handleDeleteAdjustment = (id: string) => {
     if (confirm(lang === 'bn' ? 'আপনি কি এই সমন্বয় এন্ট্রিটি মুছে ফেলতে চান?' : 'Are you sure you want to delete this adjustment?')) {
       persistAdjustments(adjustments.filter(a => a.id !== id));
     }
   };
 
-  // Update previous Month Balance Carryover
   const handleSavePrevBal = () => {
     const val = Number(prevBalInput);
     if (isNaN(val)) return;
-    const existing = balances.find(b => b.monthYear === currentMonthYear);
-    if (existing) {
-      persistBalances(balances.map(b => b.monthYear === currentMonthYear ? { ...b, balance: val } : b));
-    } else {
-      persistBalances([...balances, { id: 'bal_' + Math.random().toString(36).substr(2, 9), monthYear: currentMonthYear, balance: val }]);
-    }
+    persistBalances([{ id: 'bal_1', monthYear: `July ${fiscalState.year}`, balance: val }]);
     setIsEditingPrevBal(false);
   };
 
-  // Aggregate Calculations for Current Selection
+  // Aggregate Calculations for Current Cycle Selection
   const getPropertyIncomeAggregate = (propId: string) => {
-    const matches = incomeRows.filter(r => r.propertyId === propId && r.monthYear === currentMonthYear);
+    const matches = cycleIncome.filter(r => r.propertyId === propId);
     return matches.reduce((sum, r) => sum + r.flatRent + r.advance + r.liftBill + r.electricityBill + r.gasBill + r.garageRent, 0);
   };
 
   const getPropertyExpenseAggregate = (propId: string) => {
-    const matches = expenseRows.filter(r => r.propertyId === propId && r.monthYear === currentMonthYear);
+    const matches = cycleExpense.filter(r => r.propertyId === propId);
     return matches.reduce((sum, r) => sum + r.totalCost, 0);
   };
 
@@ -420,8 +402,8 @@ export default function Reports({ companyId }: { companyId: string }) {
     };
   });
 
-  const summaryManualIncome = filteredAdjustments.filter(a => a.type === 'income').reduce((sum, a) => sum + a.amount, 0);
-  const summaryManualExpense = filteredAdjustments.filter(a => a.type === 'expense').reduce((sum, a) => sum + a.amount, 0);
+  const summaryManualIncome = cycleAdjustments.filter(a => a.type === 'income').reduce((sum, a) => sum + a.amount, 0);
+  const summaryManualExpense = cycleAdjustments.filter(a => a.type === 'expense').reduce((sum, a) => sum + a.amount, 0);
 
   const aggregatePropertiesIncome = summaryPropertiesData.reduce((sum, p) => sum + p.income, 0);
   const aggregatePropertiesExpense = summaryPropertiesData.reduce((sum, p) => sum + p.expense, 0);
@@ -432,9 +414,12 @@ export default function Reports({ companyId }: { companyId: string }) {
   const summarySubtotal = activePrevBal + summaryGrandTotalIncome;
   const summaryClosingBalance = summarySubtotal - summaryGrandTotalExpense;
 
-  const currentMonthBn = MONTHS_MAP.bn[MONTHS_MAP.en.indexOf(selectedMonth)];
+  const { startDate, endDate } = getFiscalDateRange(fiscalState);
 
-  // Print Report sheet trigger
+  // Estimated Tax / VAT Calculation (15% VAT, 5% Tax)
+  const estimatedTax = Math.round(summaryGrandTotalIncome * 0.05);
+  const estimatedVAT = Math.round(summaryGrandTotalIncome * 0.15);
+
   const handlePrint = () => {
     window.print();
   };
@@ -482,42 +467,35 @@ export default function Reports({ companyId }: { companyId: string }) {
           tr {
             page-break-inside: avoid !important;
           }
-          .print-header {
-            display: block !important;
-            text-align: center !important;
-            margin-bottom: 20px !important;
-          }
-          .print-header h1 {
-            font-size: 20px !important;
-            font-weight: bold !important;
-            margin-bottom: 5px !important;
-          }
-          .print-header p {
-            font-size: 12px !important;
-            margin: 2px 0 !important;
-          }
-        }
-        .print-header {
-          display: none;
         }
       `}</style>
 
+      {/* Reusable Global Fiscal & Billing Cycle Filter */}
+      <div className="no-print">
+        <FiscalCycleFilter
+          state={fiscalState}
+          onChange={setFiscalState}
+          properties={properties}
+          showPropertySelector={false}
+        />
+      </div>
+
       {/* Main Controls - HIDE ON PRINT */}
-      <div className="no-print glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 flex flex-wrap gap-4 items-center justify-between">
+      <div className="no-print glass-panel rounded-2xl p-5 border border-slate-200 flex flex-wrap gap-4 items-center justify-between">
         
         <div className="flex flex-wrap items-center gap-3">
           {/* Property Selector */}
           <div className="flex flex-col">
             <label className="text-[10px] uppercase font-bold text-slate-400 mb-1 flex items-center gap-1">
               <Building className="w-3.5 h-3.5 text-sky-400" />
-              {lang === 'bn' ? 'প্রপার্টি' : 'Select Property'}
+              {lang === 'bn' ? 'রিপোর্ট ফরম্যাট' : 'Report Format'}
             </label>
             <select
               value={selectedPropertyId}
               onChange={(e) => setSelectedPropertyId(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 outline-none font-semibold text-slate-700 dark:text-slate-200"
+              className="bg-slate-50 border border-slate-200 rounded-xl text-xs px-3 py-2 outline-none font-semibold text-slate-700"
             >
-              <option value="all">{lang === 'bn' ? 'সকল প্রপার্টি (সারসংক্ষেপ)' : 'Centralized Summary Page'}</option>
+              <option value="all">{lang === 'bn' ? 'সকল প্রপার্টি (সমন্বিত লাভ-ক্ষতি সারসংক্ষেপ)' : 'Centralized Profit & Loss Summary'}</option>
               {properties.map(p => (
                 <option key={p.id} value={p.id}>
                   {lang === 'bn' ? p.name.split(' (')[0] : p.name}
@@ -526,707 +504,370 @@ export default function Reports({ companyId }: { companyId: string }) {
             </select>
           </div>
 
-          {/* Month Selector */}
-          <div className="flex flex-col">
-            <label className="text-[10px] uppercase font-bold text-slate-400 mb-1 flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-purple-400" />
-              {lang === 'bn' ? 'মাস' : 'Month'}
-            </label>
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 outline-none font-semibold text-slate-700 dark:text-slate-200"
-            >
-              {MONTHS_MAP.en.map((m, idx) => (
-                <option key={m} value={m}>
-                  {lang === 'bn' ? MONTHS_MAP.bn[idx] : m}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Year Selector */}
-          <div className="flex flex-col">
-            <label className="text-[10px] uppercase font-bold text-slate-400 mb-1">
-              {lang === 'bn' ? 'বছর' : 'Year'}
-            </label>
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 outline-none font-semibold text-slate-700 dark:text-slate-200"
-            >
-              <option value="2025">{lang === 'bn' ? '২০২৫' : '2025'}</option>
-              <option value="2026">{lang === 'bn' ? '২০২৬' : '2026'}</option>
-              <option value="2027">{lang === 'bn' ? '২০২৭' : '2027'}</option>
-            </select>
-          </div>
+          {/* Toggle Income vs Expense for Individual Property Detail View */}
+          {selectedPropertyId !== 'all' && (
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 self-end">
+              <button
+                onClick={() => setReportType('income')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  reportType === 'income' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800 '
+                }`}
+              >
+                {lang === 'bn' ? 'আয় হিসাব (ক্যাশ ইনফ্লো)' : 'Income Ledger'}
+              </button>
+              <button
+                onClick={() => setReportType('expense')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  reportType === 'expense' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800 '
+                }`}
+              >
+                {lang === 'bn' ? 'ব্যয় হিসাব (ক্যাশ আউটফ্লো)' : 'Expense Ledger'}
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Ledger Category Toggle (Only when single property selected) */}
-        {selectedPropertyId !== 'all' && (
-          <div className="flex items-center bg-slate-100 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
-            <button
-              onClick={() => setReportType('income')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                reportType === 'income' 
-                  ? 'bg-sky-500 text-white shadow' 
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
-              }`}
-            >
-              {t('reportIncomeLedger')}
-            </button>
-            <button
-              onClick={() => setReportType('expense')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                reportType === 'expense' 
-                  ? 'bg-sky-500 text-white shadow' 
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
-              }`}
-            >
-              {t('reportExpenseLedger')}
-            </button>
-          </div>
-        )}
-
-        {/* Quick Document Actions */}
+        {/* Action Export Buttons */}
         <div className="flex items-center gap-2">
-          <button 
-            onClick={handlePrint}
-            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-850 rounded-xl text-slate-700 dark:text-slate-300 transition-all flex items-center gap-1.5 font-semibold text-xs"
-          >
-            <Printer className="w-4 h-4 text-sky-500" />
-            <span className="hidden md:inline">{lang === 'bn' ? 'প্রিন্ট' : 'Print'}</span>
-          </button>
-          
-          <button 
+          <button
             onClick={handleExportExcel}
-            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-850 rounded-xl text-slate-700 dark:text-slate-300 transition-all flex items-center gap-1.5 font-semibold text-xs"
+            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/20 cursor-pointer"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
-            <span className="hidden md:inline">Excel</span>
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Excel Export</span>
           </button>
-
-          <button 
+          <button
             onClick={handleExportPDF}
-            className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-850 rounded-xl text-slate-700 dark:text-slate-300 transition-all flex items-center gap-1.5 font-semibold text-xs"
+            className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/20 cursor-pointer"
           >
-            <FileDown className="w-4 h-4 text-rose-500" />
-            <span className="hidden md:inline">PDF</span>
+            <FileDown className="w-4 h-4" />
+            <span>PDF Export</span>
+          </button>
+          <button
+            onClick={handlePrint}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Print Sheet</span>
           </button>
         </div>
 
       </div>
 
-      {/* Primary Report Page Card */}
-      <div className="print-full-width glass-panel rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-blue-900/20 bg-card-bg shadow-xl">
+      {/* Tax / VAT Quick Estimate Cards (Period-wise Aligned) */}
+      <div className="no-print grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-slate-400 block uppercase">সাইকেলের মোট আয় (Revenue)</span>
+            <span className="text-lg font-black text-emerald-500">{formatCurrency(summaryGrandTotalIncome, lang)}</span>
+          </div>
+          <TrendingUp className="w-5 h-5 text-emerald-500" />
+        </div>
+        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-slate-400 block uppercase">আনুমানিক আয়কর (AIT Tax ~5%)</span>
+            <span className="text-lg font-black text-indigo-500">{formatCurrency(estimatedTax, lang)}</span>
+          </div>
+          <FileText className="w-5 h-5 text-indigo-500" />
+        </div>
+        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-slate-400 block uppercase">আনুমানিক মুসক / ভ্যাট (VAT ~15%)</span>
+            <span className="text-lg font-black text-purple-500">{formatCurrency(estimatedVAT, lang)}</span>
+          </div>
+          <FileText className="w-5 h-5 text-purple-500" />
+        </div>
+      </div>
+
+      {/* REPORT CONTENT AREA - CENTRALIZED SUMMARY OR SINGLE PROPERTY */}
+      {selectedPropertyId === 'all' ? (
         
-        {/* Printable Document Headers */}
-        <div className="print-header text-center mb-6">
-          <h1 className="text-xl font-bold uppercase tracking-wider text-slate-900">
-            {selectedPropertyId === 'all' 
-              ? (lang === 'bn' ? 'মোট আয়-ব্যয়ের হিসাবসমূহ' : 'Statement of General Accounts Summary')
-              : (properties.find(p => p.id === selectedPropertyId)?.name.split(' (')[0] || '')
-            }
-          </h1>
-          <p className="text-sm font-semibold text-slate-600">
-            {selectedPropertyId === 'all'
-              ? (lang === 'bn' ? `${currentMonthBn} - ${toBanglaNumerals(selectedYear)}ইং` : `${selectedMonth} - ${selectedYear}`)
-              : (reportType === 'income' 
-                  ? (lang === 'bn' ? `মাসিক মোট ভাড়ার (আয়) হিসাব (${currentMonthBn} - ${toBanglaNumerals(selectedYear)}ইং)` : `Monthly Rent & Utilities Income Statement (${selectedMonth} - ${selectedYear})`)
-                  : (lang === 'bn' ? `খরচের হিসাব প্রতিবেদন (${currentMonthBn} - ${toBanglaNumerals(selectedYear)}ইং)` : `Operational Expenses Ledger (${selectedMonth} - ${selectedYear})`)
-                )
-            }
-          </p>
-        </div>
-
-        {/* Screen Header View (Always Visible) */}
-        <div className="no-print text-center mb-8 border-b border-slate-100 dark:border-blue-950/20 pb-5">
-          <h2 className="text-2xl font-black tracking-wide text-slate-950 dark:text-white uppercase">
-            {selectedPropertyId === 'all' 
-              ? (lang === 'bn' ? 'মোট আয়-ব্যয়ের হিসাবসমূহ' : 'General Statement of Accounts')
-              : (lang === 'bn' 
-                  ? properties.find(p => p.id === selectedPropertyId)?.name.split(' (')[0] 
-                  : properties.find(p => p.id === selectedPropertyId)?.name
-                )
-            }
-          </h2>
-          <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">
-            {selectedPropertyId === 'all'
-              ? (lang === 'bn' ? `${currentMonthBn} - ${toBanglaNumerals(selectedYear)}ইং` : `${selectedMonth} - ${selectedYear}`)
-              : (reportType === 'income' 
-                  ? (lang === 'bn' ? `মাসিক মোট ভাড়ার (আয়) হিসাব (${currentMonthBn} - ${toBanglaNumerals(selectedYear)}ইং)` : `Monthly Rent (Income) Ledger (${selectedMonth} - ${selectedYear})`)
-                  : (lang === 'bn' ? `খরচের হিসাব প্রতিবেদন (${currentMonthBn} - ${toBanglaNumerals(selectedYear)}ইং)` : `Expense Ledger Report (${selectedMonth} - ${selectedYear})`)
-                )
-            }
-          </p>
-        </div>
-
-        {/* ========================================================
-            TABULAR VIEW 1: INDIVIDUAL PROPERTY INCOME LEDGER
-           ======================================================== */}
-        {selectedPropertyId !== 'all' && reportType === 'income' && (
-          <div className="space-y-6">
-            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-blue-950/50">
-              <table className="w-full text-center border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 dark:bg-blue-950/20 text-slate-500 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-blue-950/60 text-xs">
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40 w-10">{t('reportSerialNo')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportFloorNo')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportFlatNo')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40 min-w-44 text-left">{t('reportTenantName')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportFlatRent')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportAdvance')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportLiftBill')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportElectricityBill')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportGasBill')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportGarageRent')}</th>
-                    <th className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/40">{t('reportTotalRent')}</th>
-                    <th className="py-3 px-2 no-print">{t('actions')}</th>
-                  </tr>
-                </thead>
-                <tbody className="text-xs divide-y divide-slate-100 dark:divide-blue-950/20">
-                  {filteredIncome.length === 0 ? (
-                    <tr>
-                      <td colSpan={12} className="py-8 text-center text-slate-400 font-medium italic">
-                        {lang === 'bn' ? 'এই মাসের জন্য কোনো তথ্য পাওয়া যায়নি।' : 'No records found for the selected month.'}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredIncome.map((row, index) => {
-                      const rowTotal = row.flatRent + row.liftBill + row.electricityBill + row.gasBill + row.garageRent;
-                      return (
-                        <tr key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-blue-950/10 text-slate-700 dark:text-slate-300">
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20 font-semibold">
-                            {lang === 'bn' ? toBanglaNumerals(index + 1) : index + 1}
-                          </td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20">{row.floorNo}</td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20 font-semibold">{row.flatNo}</td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20 font-bold text-left text-slate-900 dark:text-slate-200">
-                            {row.tenantName}
-                          </td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20 font-medium">
-                            {row.flatRent > 0 ? (lang === 'bn' ? toBanglaNumerals(row.flatRent) : row.flatRent.toLocaleString()) : '০'}
-                          </td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20 font-semibold text-sky-600 dark:text-sky-400">
-                            {row.advance > 0 ? (lang === 'bn' ? toBanglaNumerals(row.advance) : row.advance.toLocaleString()) : ''}
-                          </td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20">
-                            {row.liftBill > 0 ? (lang === 'bn' ? toBanglaNumerals(row.liftBill) : row.liftBill.toLocaleString()) : '০'}
-                          </td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20 text-blue-600 dark:text-blue-400">
-                            {row.electricityBill > 0 ? (lang === 'bn' ? toBanglaNumerals(row.electricityBill) : row.electricityBill.toLocaleString()) : '০'}
-                          </td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20 text-orange-600 dark:text-orange-400">
-                            {row.gasBill > 0 ? (lang === 'bn' ? toBanglaNumerals(row.gasBill) : row.gasBill.toLocaleString()) : '০'}
-                          </td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20">
-                            {row.garageRent > 0 ? (lang === 'bn' ? toBanglaNumerals(row.garageRent) : row.garageRent.toLocaleString()) : ''}
-                          </td>
-                          <td className="py-3 px-2 border-r border-slate-200 dark:border-blue-950/20 font-extrabold text-emerald-600 dark:text-emerald-400">
-                            {rowTotal > 0 ? (lang === 'bn' ? toBanglaNumerals(rowTotal) : rowTotal.toLocaleString()) : '০'}
-                          </td>
-                          <td className="py-3 px-2 no-print">
-                            <button
-                              onClick={() => handleDeleteIncome(row.id)}
-                              className="p-1 hover:bg-rose-500/10 text-rose-500 rounded-lg transition-all"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                  {/* Ledger Summary / Grand Totals Row */}
-                  {filteredIncome.length > 0 && (
-                    <tr className="bg-indigo-50/80 dark:bg-indigo-950/50 text-slate-900 dark:text-white font-extrabold text-xs border-t-2 border-b-2 border-indigo-200 dark:border-indigo-900/60 shadow-sm">
-                      <td colSpan={4} className="py-3.5 px-2 border-r border-slate-200 dark:border-blue-950/40 text-right">
-                        {lang === 'bn' ? 'মোট =' : 'Total ='}
-                      </td>
-                      <td className="py-3.5 px-2 border-r border-slate-200 dark:border-blue-950/40">
-                        {lang === 'bn' ? toBanglaNumerals(currentPropertyIncomeSum.rent) : currentPropertyIncomeSum.rent.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-2 border-r border-slate-200 dark:border-blue-950/40 text-sky-600 dark:text-sky-400">
-                        {lang === 'bn' ? toBanglaNumerals(currentPropertyIncomeSum.advance) : currentPropertyIncomeSum.advance.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-2 border-r border-slate-200 dark:border-blue-950/40">
-                        {lang === 'bn' ? toBanglaNumerals(currentPropertyIncomeSum.lift) : currentPropertyIncomeSum.lift.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-2 border-r border-slate-200 dark:border-blue-950/40 text-blue-600 dark:text-blue-400">
-                        {lang === 'bn' ? toBanglaNumerals(currentPropertyIncomeSum.elec) : currentPropertyIncomeSum.elec.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-2 border-r border-slate-200 dark:border-blue-950/40 text-orange-600 dark:text-orange-400">
-                        {lang === 'bn' ? toBanglaNumerals(currentPropertyIncomeSum.gas) : currentPropertyIncomeSum.gas.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-2 border-r border-slate-200 dark:border-blue-950/40">
-                        {lang === 'bn' ? toBanglaNumerals(currentPropertyIncomeSum.garage) : currentPropertyIncomeSum.garage.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-2 border-r border-slate-200 dark:border-blue-950/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10">
-                        {lang === 'bn' ? toBanglaNumerals(currentPropertyIncomeSum.total) : currentPropertyIncomeSum.total.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-2 no-print"></td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* In Words Bottom block */}
-            {filteredIncome.length > 0 && (
-              <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('reportAmountInWords')}</span>
-                  <p className="font-black text-slate-800 dark:text-slate-100 text-sm">
-                    {lang === 'bn' 
-                      ? toBanglaWords(currentPropertyIncomeSum.total) 
-                      : toEnglishWords(currentPropertyIncomeSum.total)
-                    }
-                  </p>
-                </div>
-              </div>
-            )}
-
+        /* CENTRALIZED PROFIT & LOSS SUMMARY REPORT SHEET */
+        <div className="print-full-width bg-white text-slate-900 p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-xl space-y-6">
+          
+          {/* Header Title Banner */}
+          <div className="text-center border-b-2 border-slate-800 pb-4 space-y-1">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-wide uppercase">
+              {lang === 'bn' ? 'আলিফ টাওয়ার ও অন্যান্য প্রতিষ্ঠানের আয় ও ব্যায়ের হিসাব' : 'ALIF TOWER & ASSOCIATES CONSOLIDATED PROFIT & LOSS'}
+            </h1>
+            <p className="text-sm font-extrabold text-slate-700">
+              {lang === 'bn' ? 'পরিক্রমণ সময়কাল: ' : 'Reporting Period: '}
+              <span className="underline">{startDate}</span> {lang === 'bn' ? 'থেকে' : 'to'} <span className="underline">{endDate}</span>
+              {fiscalState.mode === 'quarterly' ? ` (${fiscalState.period} Quarterly)` : ` (Monthly Cycle)`}
+            </p>
           </div>
-        )}
 
-        {/* ========================================================
-            TABULAR VIEW 2: INDIVIDUAL PROPERTY OPERATIONAL EXPENSES
-           ======================================================== */}
-        {selectedPropertyId !== 'all' && reportType === 'expense' && (
-          <div className="space-y-6">
-            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-blue-950/50">
-              <table className="w-full text-center border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 dark:bg-blue-950/20 text-slate-500 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-blue-950/60 text-xs">
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 w-16">{t('reportSerialNo')}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 w-28">{t('reportDate')}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 w-24">{t('reportMemoNo')}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 text-left">{t('reportGoodsDetails')}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 w-36">{t('reportQuantity')}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 w-36">{t('reportTotalCost')}</th>
-                    <th className="py-3 px-3 no-print w-16">{t('actions')}</th>
+          {/* Centralized Summary Grid Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs border-collapse border border-slate-400 text-left">
+              <thead>
+                <tr className="bg-slate-100 text-slate-900 font-extrabold text-center border-b border-slate-400">
+                  <th className="p-2 border border-slate-400 w-12">ক্রঃ নং</th>
+                  <th className="p-2 border border-slate-400">প্রতিষ্ঠানের নাম ও বিবরণ</th>
+                  <th className="p-2 border border-slate-400 text-right w-36">মোট আদায় (টাকা)</th>
+                  <th className="p-2 border border-slate-400 text-right w-36">মোট খরচ (টাকা)</th>
+                  <th className="p-2 border border-slate-400 text-right w-36">নিট লাভ (টাকা)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-300 font-medium">
+                {summaryPropertiesData.map(prop => (
+                  <tr key={prop.index} className="hover:bg-slate-50">
+                    <td className="p-2 border border-slate-300 text-center font-bold">{toBanglaNumerals(prop.index)}</td>
+                    <td className="p-2 border border-slate-300 font-bold text-slate-800">
+                      {prop.name} <span className="text-[11px] font-normal text-slate-600">{prop.details}</span>
+                    </td>
+                    <td className="p-2 border border-slate-300 text-right font-bold text-emerald-700">
+                      {formatCurrency(prop.income, lang)}
+                    </td>
+                    <td className="p-2 border border-slate-300 text-right font-bold text-rose-700">
+                      {formatCurrency(prop.expense, lang)}
+                    </td>
+                    <td className={`p-2 border border-slate-300 text-right font-bold ${
+                      (prop.income - prop.expense) >= 0 ? 'text-emerald-700' : 'text-rose-700'
+                    }`}>
+                      {formatCurrency(prop.income - prop.expense, lang)}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="text-xs divide-y divide-slate-100 dark:divide-blue-950/20">
-                  {filteredExpense.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="py-8 text-center text-slate-400 font-medium italic">
-                        {lang === 'bn' ? 'এই মাসের জন্য কোনো খরচের তথ্য পাওয়া যায়নি।' : 'No operational expenses found for the selected month.'}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredExpense.map((row, index) => (
-                      <tr key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-blue-950/10 text-slate-700 dark:text-slate-300">
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-semibold">
-                          {lang === 'bn' ? toBanglaNumerals(index + 1) : index + 1}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20">
-                          {lang === 'bn' ? toBanglaNumerals(row.date) : row.date}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-semibold">
-                          {lang === 'bn' ? toBanglaNumerals(row.memoNo) : row.memoNo}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 text-left font-bold text-slate-900 dark:text-slate-200">
-                          {row.details}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20">
-                          {row.quantity}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-black text-rose-500">
-                          {lang === 'bn' ? toBanglaNumerals(row.totalCost.toLocaleString()) : row.totalCost.toLocaleString()}
-                        </td>
-                        <td className="py-3 px-3 no-print">
-                          <button
-                            onClick={() => handleDeleteExpense(row.id)}
-                            className="p-1 hover:bg-rose-500/10 text-rose-500 rounded-lg transition-all"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                  {/* Ledger Summary / Grand Totals Row */}
-                  {filteredExpense.length > 0 && (
-                    <tr className="bg-indigo-50/80 dark:bg-indigo-950/50 text-slate-900 dark:text-white font-extrabold text-xs border-t-2 border-b-2 border-indigo-200 dark:border-indigo-900/60 shadow-sm">
-                      <td colSpan={5} className="py-3.5 px-3 border-r border-slate-200 dark:border-blue-950/40 text-right">
-                        {lang === 'bn' ? 'মোট খরচ =' : 'Total Expense ='}
-                      </td>
-                      <td className="py-3.5 px-3 border-r border-slate-200 dark:border-blue-950/40 text-rose-500 bg-rose-500/10 font-black text-sm">
-                        {lang === 'bn' ? toBanglaNumerals(currentPropertyExpenseSum.toLocaleString()) : currentPropertyExpenseSum.toLocaleString()}
-                      </td>
-                      <td className="py-3.5 px-3 no-print"></td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                ))}
 
-            {/* In Words Bottom block */}
-            {filteredExpense.length > 0 && (
-              <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('reportAmountInWords')}</span>
-                  <p className="font-black text-slate-800 dark:text-slate-100 text-sm">
-                    {lang === 'bn' 
-                      ? toBanglaWords(currentPropertyExpenseSum) 
-                      : toEnglishWords(currentPropertyExpenseSum)
-                    }
-                  </p>
-                </div>
+                {/* Adjustments rows */}
+                {cycleAdjustments.map((adj, idx) => (
+                  <tr key={adj.id} className="bg-slate-50/50">
+                    <td className="p-2 border border-slate-300 text-center font-bold">{toBanglaNumerals(summaryPropertiesData.length + idx + 1)}</td>
+                    <td className="p-2 border border-slate-300 font-bold text-slate-800 flex justify-between items-center">
+                      <span>{adj.description} {adj.comment ? `(${adj.comment})` : ''}</span>
+                      <button
+                        onClick={() => handleDeleteAdjustment(adj.id)}
+                        className="no-print text-rose-500 hover:text-rose-700 p-1"
+                        title="Delete adjustment"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                    <td className="p-2 border border-slate-300 text-right font-bold text-emerald-700">
+                      {adj.type === 'income' ? formatCurrency(adj.amount, lang) : '-'}
+                    </td>
+                    <td className="p-2 border border-slate-300 text-right font-bold text-rose-700">
+                      {adj.type === 'expense' ? formatCurrency(adj.amount, lang) : '-'}
+                    </td>
+                    <td className="p-2 border border-slate-300 text-right font-bold">
+                      {formatCurrency(adj.type === 'income' ? adj.amount : -adj.amount, lang)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+
+              {/* Summary Totals Footer */}
+              <tfoot className="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-800">
+                <tr>
+                  <td colSpan={2} className="p-2.5 border border-slate-400 text-right uppercase">
+                    {lang === 'bn' ? 'সর্বমোট আয় ও ব্যয়:' : 'Grand Total Revenue & Expense:'}
+                  </td>
+                  <td className="p-2.5 border border-slate-400 text-right text-emerald-700 text-sm">
+                    {formatCurrency(summaryGrandTotalIncome, lang)}
+                  </td>
+                  <td className="p-2.5 border border-slate-400 text-right text-rose-700 text-sm">
+                    {formatCurrency(summaryGrandTotalExpense, lang)}
+                  </td>
+                  <td className="p-2.5 border border-slate-400 text-right text-indigo-900 text-sm">
+                    {formatCurrency(summaryGrandTotalIncome - summaryGrandTotalExpense, lang)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {/* Dynamic Add Adjustment Action Button */}
+          <div className="no-print pt-2 flex justify-end">
+            <button
+              onClick={() => setShowAdjustmentForm(!showAdjustmentForm)}
+              className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{lang === 'bn' ? 'নতুন সমন্বয় বা সাধারণ আয়/ব্যয় যোগ করুন' : 'Add Custom Summary Item'}</span>
+            </button>
+          </div>
+
+          {/* Form Modal / Inline Form for Summary Adjustment */}
+          {showAdjustmentForm && (
+            <form onSubmit={handleAddAdjustment} className="no-print bg-slate-50 p-4 rounded-xl border border-slate-300 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+              <div className="sm:col-span-2">
+                <label className="font-bold text-slate-700 block mb-1">বিবরণ (Description) *</label>
+                <input
+                  type="text"
+                  placeholder="e.g. বাহিরের গাড়ি ভাড়া / কনসালটেন্সি ফি"
+                  value={newAdjDesc}
+                  onChange={e => setNewAdjDesc(e.target.value)}
+                  className="w-full p-2 bg-white border border-slate-300 rounded-lg"
+                  required
+                />
               </div>
-            )}
-
-            {/* Inline Add Expense Row Sub-Form (No-Print) */}
-            <div className="no-print border border-dashed border-slate-300 dark:border-blue-950/50 rounded-2xl p-4">
-              {!showExpenseForm ? (
-                <button
-                  onClick={() => setShowExpenseForm(true)}
-                  className="w-full py-3 flex items-center justify-center gap-1.5 text-xs text-sky-500 dark:text-sky-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition-all"
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">ধরণ (Type) *</label>
+                <select
+                  value={newAdjType}
+                  onChange={e => setNewAdjType(e.target.value as any)}
+                  className="w-full p-2 bg-white border border-slate-300 rounded-lg"
                 >
-                  <Plus className="w-4 h-4" />
-                  {lang === 'bn' ? 'নতুন খরচের হিসাব লিপিবদ্ধ করুন' : 'Add New Expense Record'}
+                  <option value="income">সাধারণ আয় (Income)</option>
+                  <option value="expense">সাধারণ ব্যয় (Expense)</option>
+                </select>
+              </div>
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">পরিমাণ (Amount) *</label>
+                <input
+                  type="number"
+                  placeholder="e.g. 12900"
+                  value={newAdjAmount}
+                  onChange={e => setNewAdjAmount(e.target.value)}
+                  className="w-full p-2 bg-white border border-slate-300 rounded-lg"
+                  required
+                />
+              </div>
+              <div className="sm:col-span-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdjustmentForm(false)}
+                  className="px-3 py-1.5 border border-slate-300 rounded-lg text-slate-600 font-bold"
+                >
+                  বাতিল
                 </button>
-              ) : (
-                <form onSubmit={handleAddExpense} className="space-y-4">
-                  <span className="text-xs font-bold text-slate-400 uppercase block mb-1">New Expense Ledger Entry</span>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    <input 
-                      type="date" 
-                      placeholder="Date (তারিখ)" 
-                      value={newExpDate}
-                      onChange={(e) => setNewExpDate(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-300"
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="Memo No (মেমো নং)" 
-                      value={newExpMemo}
-                      onChange={(e) => setNewExpMemo(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-300"
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="Goods Description (মালামালের বিবরণ)" 
-                      value={newExpDetails}
-                      onChange={(e) => setNewExpDetails(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-300"
-                      required
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="Quantity (পরিমাণ)" 
-                      value={newExpQty}
-                      onChange={(e) => setNewExpQty(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-300"
-                    />
-                    <input 
-                      type="number" 
-                      placeholder="Total Price (মোট মূল্য)" 
-                      value={newExpCost}
-                      onChange={(e) => setNewExpCost(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-300"
-                      required
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setShowExpenseForm(false)}
-                      className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 rounded-xl text-slate-600 dark:text-slate-400"
-                    >
-                      {t('cancel')}
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-5 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold flex items-center gap-1"
-                    >
-                      <Check className="w-4 h-4" />
-                      {lang === 'bn' ? 'সংরক্ষণ করুন' : 'Save Expense Record'}
-                    </button>
-                  </div>
-                </form>
-              )}
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-emerald-600 text-white font-bold rounded-lg"
+                >
+                  সংরক্ষণ করুন
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Statement Spoken In Words Signature Footer */}
+          <div className="pt-6 border-t border-slate-300 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 text-xs font-bold text-slate-800">
+            <div>
+              <p>কথা: <span className="underline font-extrabold">{lang === 'bn' ? toBanglaWords(summaryClosingBalance) : toEnglishWords(summaryClosingBalance)}</span></p>
             </div>
-
+            <div className="flex gap-12 text-center pt-8">
+              <div>
+                <div className="w-32 border-b border-slate-800 mb-1"></div>
+                <p>হিসাবরক্ষক</p>
+              </div>
+              <div>
+                <div className="w-32 border-b border-slate-800 mb-1"></div>
+                <p>ব্যবস্থাপনা পরিচালক</p>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* ========================================================
-            TABULAR VIEW 3: CENTRALIZED MASTER SUMMARY PAGE
-           ======================================================== */}
-        {selectedPropertyId === 'all' && (
-          <div className="space-y-6">
-            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-blue-950/50">
-              <table className="w-full text-center border-collapse">
+        </div>
+
+      ) : (
+
+        /* INDIVIDUAL PROPERTY AUDIT REPORT SHEET */
+        <div className="print-full-width bg-white text-slate-900 p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-xl space-y-6">
+          
+          <div className="text-center border-b-2 border-slate-800 pb-4 space-y-1">
+            <h1 className="text-2xl font-black text-slate-900 tracking-wide uppercase">
+              {properties.find(p => p.id === selectedPropertyId)?.name}
+            </h1>
+            <h2 className="text-base font-extrabold text-slate-800">
+              {reportType === 'income' ? (lang === 'bn' ? 'ভাড়া আদায় ও ইউটিলিটি তালিকা' : 'Rent Collection & Utility Statement') : (lang === 'bn' ? 'যাবতীয় ব্যয়ের হিসাব বিবরণী' : 'Property Maintenance & Expenses Audit Sheet')}
+            </h2>
+            <p className="text-xs font-bold text-slate-600">
+              {lang === 'bn' ? 'তারিখ রেঞ্জ: ' : 'Date Range: '} {startDate} ~ {endDate}
+            </p>
+          </div>
+
+          {reportType === 'income' ? (
+            /* INCOME TABLE */
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse border border-slate-400">
                 <thead>
-                  <tr className="bg-slate-50 dark:bg-blue-950/20 text-slate-500 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-blue-950/60 text-xs">
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 w-16">{t('reportSerialNo')}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 text-left min-w-80">{lang === 'bn' ? 'বিবরণ' : 'Description Details'}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 w-48">{t('reportIncomeSummary')}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 w-48">{t('reportExpenseSummary')}</th>
-                    <th className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/40 text-left w-52">{t('reportComment')}</th>
-                    <th className="py-3 px-3 no-print w-16">{t('actions')}</th>
+                  <tr className="bg-slate-100 text-slate-900 font-extrabold text-center">
+                    <th className="p-2 border border-slate-400">তলা</th>
+                    <th className="p-2 border border-slate-400">ফ্ল্যাট</th>
+                    <th className="p-2 border border-slate-400">ভাড়াটিয়ার নাম</th>
+                    <th className="p-2 border border-slate-400 text-right">ফ্ল্যাট ভাড়া</th>
+                    <th className="p-2 border border-slate-400 text-right">অগ্রিম</th>
+                    <th className="p-2 border border-slate-400 text-right">লিফট বিল</th>
+                    <th className="p-2 border border-slate-400 text-right">বিদ্যুৎ বিল</th>
+                    <th className="p-2 border border-slate-400 text-right">গ্যাস বিল</th>
+                    <th className="p-2 border border-slate-400 text-right">গ্যারেজ ভাড়া</th>
+                    <th className="p-2 border border-slate-400 text-right">মোট টাকা</th>
                   </tr>
                 </thead>
-                <tbody className="text-xs divide-y divide-slate-100 dark:divide-blue-950/20">
-                  
-                  {/* Aggregated Properties rows */}
-                  {summaryPropertiesData.map((prop) => (
-                    <tr key={prop.name} className="hover:bg-slate-50/50 dark:hover:bg-blue-950/10 text-slate-700 dark:text-slate-300">
-                      <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-semibold">
-                        {lang === 'bn' ? toBanglaNumerals(prop.index) : prop.index}
-                      </td>
-                      <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 text-left font-bold text-slate-900 dark:text-slate-200">
-                        {prop.name} {prop.details}
-                      </td>
-                      <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-black text-emerald-500">
-                        {prop.income > 0 ? (lang === 'bn' ? toBanglaNumerals(prop.income.toLocaleString()) : prop.income.toLocaleString()) : ''}
-                      </td>
-                      <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-black text-rose-500">
-                        {prop.expense > 0 ? (lang === 'bn' ? toBanglaNumerals(prop.expense.toLocaleString()) : prop.expense.toLocaleString()) : ''}
-                      </td>
-                      <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 text-left text-slate-500">
-                        {prop.name.includes('মহিউদ্দিন') && prop.expense > 0 ? (lang === 'bn' ? 'বেতন, ইত্যাদি) =' : 'Wages, utilities combined') : ''}
-                      </td>
-                      <td className="py-3 px-3 no-print"></td>
-                    </tr>
-                  ))}
-
-                  {/* Manual Adjustment rows */}
-                  {filteredAdjustments.map((adj, index) => {
-                    const slNo = summaryPropertiesData.length + index + 1;
+                <tbody className="divide-y divide-slate-300 font-medium">
+                  {filteredIncome.map(row => {
+                    const rowTotal = row.flatRent + row.advance + row.liftBill + row.electricityBill + row.gasBill + row.garageRent;
                     return (
-                      <tr key={adj.id} className="hover:bg-slate-50/50 dark:hover:bg-blue-950/10 text-slate-700 dark:text-slate-300">
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-semibold">
-                          {lang === 'bn' ? toBanglaNumerals(slNo) : slNo}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 text-left font-bold text-slate-900 dark:text-slate-200">
-                          {adj.description}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-black text-emerald-500">
-                          {adj.type === 'income' ? (lang === 'bn' ? toBanglaNumerals(adj.amount.toLocaleString()) : adj.amount.toLocaleString()) : ''}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 font-black text-rose-500">
-                          {adj.type === 'expense' ? (lang === 'bn' ? toBanglaNumerals(adj.amount.toLocaleString()) : adj.amount.toLocaleString()) : ''}
-                        </td>
-                        <td className="py-3 px-3 border-r border-slate-200 dark:border-blue-950/20 text-left text-slate-500">
-                          {adj.comment || ''}
-                        </td>
-                        <td className="py-3 px-3 no-print">
-                          <button
-                            onClick={() => handleDeleteAdjustment(adj.id)}
-                            className="p-1 hover:bg-rose-500/10 text-rose-500 rounded-lg transition-all"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
+                      <tr key={row.id} className="hover:bg-slate-50">
+                        <td className="p-2 border border-slate-300 text-center font-bold">{row.floorNo}</td>
+                        <td className="p-2 border border-slate-300 text-center font-bold">{row.flatNo}</td>
+                        <td className="p-2 border border-slate-300 font-bold">{row.tenantName}</td>
+                        <td className="p-2 border border-slate-300 text-right">{row.flatRent > 0 ? formatCurrency(row.flatRent, lang) : '-'}</td>
+                        <td className="p-2 border border-slate-300 text-right">{row.advance > 0 ? formatCurrency(row.advance, lang) : '-'}</td>
+                        <td className="p-2 border border-slate-300 text-right">{row.liftBill > 0 ? formatCurrency(row.liftBill, lang) : '-'}</td>
+                        <td className="p-2 border border-slate-300 text-right">{row.electricityBill > 0 ? formatCurrency(row.electricityBill, lang) : '-'}</td>
+                        <td className="p-2 border border-slate-300 text-right">{row.gasBill > 0 ? formatCurrency(row.gasBill, lang) : '-'}</td>
+                        <td className="p-2 border border-slate-300 text-right">{row.garageRent > 0 ? formatCurrency(row.garageRent, lang) : '-'}</td>
+                        <td className="p-2 border border-slate-300 text-right font-extrabold text-emerald-800">{formatCurrency(rowTotal, lang)}</td>
                       </tr>
                     );
                   })}
-
-                  {/* Summary dynamic totals row */}
-                  <tr className="bg-indigo-50/80 dark:bg-indigo-950/50 text-slate-900 dark:text-white font-extrabold text-xs border-t-2 border-b-2 border-indigo-200 dark:border-indigo-900/60 shadow-sm">
-                    <td colSpan={2} className="py-3.5 px-3 border-r border-slate-200 dark:border-blue-950/40 text-right">
-                      {lang === 'bn' ? 'মোট =' : 'Total ='}
-                    </td>
-                    <td className="py-3.5 px-3 border-r border-slate-200 dark:border-blue-950/40 text-emerald-600 bg-emerald-500/10 font-black text-sm">
-                      {lang === 'bn' ? toBanglaNumerals(summaryGrandTotalIncome.toLocaleString()) : summaryGrandTotalIncome.toLocaleString()}
-                    </td>
-                    <td className="py-3.5 px-3 border-r border-slate-200 dark:border-blue-950/40 text-rose-500 bg-rose-500/10 font-black text-sm">
-                      {lang === 'bn' ? toBanglaNumerals(summaryGrandTotalExpense.toLocaleString()) : summaryGrandTotalExpense.toLocaleString()}
-                    </td>
-                    <td className="py-3.5 px-3 border-r border-slate-200 dark:border-blue-950/40"></td>
-                    <td className="py-3.5 px-3 no-print"></td>
-                  </tr>
-
                 </tbody>
+                <tfoot className="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-800">
+                  <tr>
+                    <td colSpan={3} className="p-2.5 border border-slate-400 text-right uppercase">সর্বমোট সংগৃহীত টাকা:</td>
+                    <td className="p-2.5 border border-slate-400 text-right">{formatCurrency(currentPropertyIncomeSum.rent, lang)}</td>
+                    <td className="p-2.5 border border-slate-400 text-right">{formatCurrency(currentPropertyIncomeSum.advance, lang)}</td>
+                    <td className="p-2.5 border border-slate-400 text-right">{formatCurrency(currentPropertyIncomeSum.lift, lang)}</td>
+                    <td className="p-2.5 border border-slate-400 text-right">{formatCurrency(currentPropertyIncomeSum.elec, lang)}</td>
+                    <td className="p-2.5 border border-slate-400 text-right">{formatCurrency(currentPropertyIncomeSum.gas, lang)}</td>
+                    <td className="p-2.5 border border-slate-400 text-right">{formatCurrency(currentPropertyIncomeSum.garage, lang)}</td>
+                    <td className="p-2.5 border border-slate-400 text-right text-emerald-800 text-sm">{formatCurrency(currentPropertyIncomeSum.total, lang)}</td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
-
-            {/* Centralized Balance Aggregations Block */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              {/* Previous carryover, incomes, expenses details */}
-              <div className="border border-slate-200 dark:border-blue-950/50 rounded-2xl p-5 bg-slate-50 dark:bg-blue-950/10 text-xs font-semibold space-y-2 text-slate-800 dark:text-slate-200">
-                
-                {/* Previous Month Carryover Balance */}
-                <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-blue-950/20">
-                  <div className="flex items-center gap-1">
-                    <span>
-                      {lang === 'bn' 
-                        ? `${prevMonthBn}-${toBanglaNumerals(selectedYear.slice(-2))}ইং মাসের মোট ব্যালেন্স` 
-                        : `${prevMonthEn} ${selectedYear} Carryover Balance`
-                      }
-                    </span>
-                    <button 
-                      onClick={() => {
-                        setPrevBalInput(String(activePrevBal));
-                        setIsEditingPrevBal(true);
-                      }}
-                      className="no-print p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded text-slate-400"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  
-                  {isEditingPrevBal ? (
-                    <div className="flex items-center gap-1.5 no-print">
-                      <input 
-                        type="number" 
-                        value={prevBalInput}
-                        onChange={(e) => setPrevBalInput(e.target.value)}
-                        className="w-24 p-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded outline-none text-xs text-slate-700 dark:text-slate-200"
-                      />
-                      <button 
-                        onClick={handleSavePrevBal}
-                        className="p-1.5 bg-emerald-500 text-white rounded hover:bg-emerald-600"
-                      >
-                        <Save className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="font-extrabold text-slate-950 dark:text-white">
-                      {formatCurrency(activePrevBal, lang)}
-                    </span>
-                  )}
-                </div>
-
-                {/* April Total Income */}
-                <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-blue-950/20">
-                  <span>
-                    {lang === 'bn' 
-                      ? `${currentMonthBn}-${toBanglaNumerals(selectedYear)}ইং মোট আয়` 
-                      : `${selectedMonth} ${selectedYear} Total Income`
-                    }
-                  </span>
-                  <span className="font-black text-emerald-600 dark:text-emerald-400">
-                    {formatCurrency(summaryGrandTotalIncome, lang)}
-                  </span>
-                </div>
-
-                {/* Subtotal (সর্বমোট) */}
-                <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-blue-950/20 bg-indigo-500/5 px-2 py-1 rounded">
-                  <span className="font-bold text-slate-950 dark:text-white">
-                    {lang === 'bn' ? 'সর্বমোট =' : 'Subtotal ='}
-                  </span>
-                  <span className="font-black text-indigo-600 dark:text-indigo-400 text-sm">
-                    {formatCurrency(summarySubtotal, lang)}
-                  </span>
-                </div>
-
-                {/* April Total Expense */}
-                <div className="flex justify-between items-center pb-2">
-                  <span>
-                    {lang === 'bn' 
-                      ? `${nextMonthBn}-${toBanglaNumerals(selectedYear.slice(-2))}ইং মোট ব্যয়` 
-                      : `${nextMonthEn} ${selectedYear} Total Expense`
-                    }
-                  </span>
-                  <span className="font-black text-rose-500">
-                    {formatCurrency(summaryGrandTotalExpense, lang)}
-                  </span>
-                </div>
-
-              </div>
-
-              {/* Grand Final Balance Card */}
-              <div className="border border-slate-200 dark:border-blue-950/50 rounded-2xl p-6 bg-gradient-to-br from-indigo-500/5 to-violet-500/5 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
-                    {lang === 'bn' 
-                      ? `${currentMonthBn}-${toBanglaNumerals(selectedYear.slice(-2))}ইং মোট ব্যালেন্স` 
-                      : `${selectedMonth} ${selectedYear} Net Balance`
-                    }
-                  </span>
-                  <h3 className="text-3xl font-black text-slate-950 dark:text-white leading-none">
-                    {formatCurrency(summaryClosingBalance, lang)}
-                  </h3>
-                </div>
-
-                <div className="mt-4 border-t border-slate-200 dark:border-blue-950/20 pt-3">
-                  <span className="text-[9px] uppercase font-semibold text-slate-400 block mb-1">{t('reportAmountInWords')}</span>
-                  <p className="font-bold text-slate-800 dark:text-slate-300 text-xs italic">
-                    {lang === 'bn' 
-                      ? toBanglaWords(summaryClosingBalance) 
-                      : toEnglishWords(summaryClosingBalance)
-                    }
-                  </p>
-                </div>
-              </div>
-
+          ) : (
+            /* EXPENSE TABLE */
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse border border-slate-400">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-900 font-extrabold text-center">
+                    <th className="p-2 border border-slate-400 w-12">ক্রঃ নং</th>
+                    <th className="p-2 border border-slate-400 w-28">তারিখ</th>
+                    <th className="p-2 border border-slate-400 w-24">মেমো নং</th>
+                    <th className="p-2 border border-slate-400">খরচের বিবরণ ও ভাউচার</th>
+                    <th className="p-2 border border-slate-400 w-28">পরিমাণ</th>
+                    <th className="p-2 border border-slate-400 text-right w-36">মোট খরচ (টাকা)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-300 font-medium">
+                  {filteredExpense.map((row, idx) => (
+                    <tr key={row.id} className="hover:bg-slate-50">
+                      <td className="p-2 border border-slate-300 text-center font-bold">{toBanglaNumerals(idx + 1)}</td>
+                      <td className="p-2 border border-slate-300 text-center font-semibold">{row.date}</td>
+                      <td className="p-2 border border-slate-300 text-center font-bold text-slate-700">{row.memoNo || '-'}</td>
+                      <td className="p-2 border border-slate-300 font-bold">{row.details}</td>
+                      <td className="p-2 border border-slate-300 text-center">{row.quantity || '-'}</td>
+                      <td className="p-2 border border-slate-300 text-right font-extrabold text-rose-800">{formatCurrency(row.totalCost, lang)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot className="bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-800">
+                  <tr>
+                    <td colSpan={5} className="p-2.5 border border-slate-400 text-right uppercase">সর্বমোট মোট খরচ:</td>
+                    <td className="p-2.5 border border-slate-400 text-right text-rose-800 text-sm">{formatCurrency(currentPropertyExpenseSum, lang)}</td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
+          )}
 
-            {/* Inline Add Manual Adjustment Record (No-Print) */}
-            <div className="no-print border border-dashed border-slate-300 dark:border-blue-950/50 rounded-2xl p-4">
-              {!showAdjustmentForm ? (
-                <button
-                  onClick={() => setShowAdjustmentForm(true)}
-                  className="w-full py-3 flex items-center justify-center gap-1.5 text-xs text-sky-500 dark:text-sky-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition-all"
-                >
-                  <Plus className="w-4 h-4" />
-                  {lang === 'bn' ? 'নতুন সমন্বয় বা অন্যান্য হিসাব যোগ করুন' : 'Add Standalone Adjustments/Other Accounts'}
-                </button>
-              ) : (
-                <form onSubmit={handleAddAdjustment} className="space-y-4">
-                  <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Add Standalone Entry (e.g. general balance, off-property entry)</span>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <select
-                      value={newAdjType}
-                      onChange={(e: any) => setNewAdjType(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-700 dark:text-slate-200"
-                    >
-                      <option value="income">Debit / Cash Inflow (আয়)</option>
-                      <option value="expense">Credit / Cash Outflow (ব্যয়)</option>
-                    </select>
-                    <input 
-                      type="text" 
-                      placeholder="Description (বিবরণ)" 
-                      value={newAdjDesc}
-                      onChange={(e) => setNewAdjDesc(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-700 dark:text-slate-200"
-                      required
-                    />
-                    <input 
-                      type="number" 
-                      placeholder="Amount (পরিমাণ)" 
-                      value={newAdjAmount}
-                      onChange={(e) => setNewAdjAmount(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-700 dark:text-slate-200"
-                      required
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="Comments (মন্তব্য)" 
-                      value={newAdjComment}
-                      onChange={(e) => setNewAdjComment(e.target.value)}
-                      className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl text-xs outline-none text-slate-700 dark:text-slate-200"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setShowAdjustmentForm(false)}
-                      className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 rounded-xl text-slate-600 dark:text-slate-400"
-                    >
-                      {t('cancel')}
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-5 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold flex items-center gap-1"
-                    >
-                      <Check className="w-4 h-4" />
-                      {lang === 'bn' ? 'সংরক্ষণ করুন' : 'Save Standalone Entry'}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
+        </div>
 
-          </div>
-        )}
-
-      </div>
+      )}
 
     </div>
   );

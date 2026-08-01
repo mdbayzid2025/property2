@@ -34,7 +34,6 @@ const translations = {
     // Quick Controls
     selectOrg: 'প্রতিষ্ঠান নির্বাচন',
     selectRole: 'রোল নির্বাচন',
-    toggleTheme: 'থিম পরিবর্তন',
     langName: 'English',
     notifications: 'নোটিফিকেশন',
 
@@ -243,7 +242,6 @@ const translations = {
     // Quick Controls
     selectOrg: 'Switch Company',
     selectRole: 'Switch Role',
-    toggleTheme: 'Toggle Theme',
     langName: 'বাংলা',
     notifications: 'Notifications',
 

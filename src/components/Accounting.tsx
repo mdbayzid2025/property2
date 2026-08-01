@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../services/translation';
 import { MockDB, AccountTransaction, Property } from '../services/db';
-import { BookOpen, Plus, Landmark, ArrowUpRight, ArrowDownRight, Calendar, FileText, Clipboard, Filter } from 'lucide-react';
+import { FiscalCycleState, DEFAULT_FISCAL_CYCLE } from '../services/fiscalCycle';
+import { filterRecordsByFiscalCycle } from '../services/mongoQueryHelper';
+import FiscalCycleFilter from './FiscalCycleFilter';
+import { BookOpen, Plus, Landmark, ArrowUpRight, ArrowDownRight, Calendar, FileText, Clipboard, X, Trash2 } from 'lucide-react';
 
 export default function Accounting({ companyId }: { companyId: string }) {
   const { t } = useTranslation();
@@ -15,10 +18,11 @@ export default function Accounting({ companyId }: { companyId: string }) {
     MockDB.getTable<Property>('properties').filter(p => p.companyId === companyId)
   );
 
-  // Property filtering state
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
+  // Global Fiscal & Billing Cycle Filter State
+  const [fiscalState, setFiscalState] = useState<FiscalCycleState>(DEFAULT_FISCAL_CYCLE);
+  const [mobileTab, setMobileTab] = useState<'income' | 'expense'>('income');
 
-  // Form State
+  // Form State (Modal)
   const [showAddForm, setShowAddForm] = useState(false);
   const [txType, setTxType] = useState<'income' | 'expense'>('income');
   const [category, setCategory] = useState('Rent Revenue');
@@ -30,14 +34,20 @@ export default function Accounting({ companyId }: { companyId: string }) {
   const [invoiceNo, setInvoiceNo] = useState('');
   const [note, setNote] = useState('');
 
-  // Filter transactions based on selected property filter
-  const filteredTxs = selectedPropertyId 
-    ? txs.filter(t => t.propertyId === selectedPropertyId)
-    : txs;
+  // Filter transactions using Fiscal Cycle Filter State & Property Filter
+  const filteredTxs = filterRecordsByFiscalCycle(
+    txs,
+    t => t.date,
+    fiscalState,
+    t => t.propertyId
+  );
+
+  const incomeTxs = filteredTxs.filter(t => t.type === 'income');
+  const expenseTxs = filteredTxs.filter(t => t.type === 'expense');
 
   // Calculations
-  const revenue = filteredTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const expense = filteredTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  const revenue = incomeTxs.reduce((sum, t) => sum + t.amount, 0);
+  const expense = expenseTxs.reduce((sum, t) => sum + t.amount, 0);
   const profit = revenue - expense;
 
   // Chart of accounts summary map
@@ -73,7 +83,11 @@ export default function Accounting({ companyId }: { companyId: string }) {
     setNote('');
     setDate(new Date().toISOString().split('T')[0]);
     setShowAddForm(false);
-    alert('Accounting transaction recorded!');
+  };
+
+  const handleDeleteTx = (id: string) => {
+    MockDB.delete('transactions', id);
+    setTxs(prev => prev.filter(t => t.id !== id));
   };
 
   const getPropertyName = (pId?: string) => {
@@ -84,9 +98,10 @@ export default function Accounting({ companyId }: { companyId: string }) {
 
   return (
     <div className="space-y-6 text-sm">
+      {/* Top Header Controls */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-2">
         <div className="flex items-center space-x-3">
-          <div className="p-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl">
+          <div className="p-2.5 bg-indigo-500/10 text-indigo-600 rounded-xl">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
@@ -95,25 +110,10 @@ export default function Accounting({ companyId }: { companyId: string }) {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Property Filter Dropdown */}
-          <div className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-sm text-xs text-slate-700">
-            <Filter className="w-3.5 h-3.5 text-indigo-500" />
-            <span className="font-semibold text-slate-600">Property:</span>
-            <select
-              value={selectedPropertyId}
-              onChange={(e) => setSelectedPropertyId(e.target.value)}
-              className="bg-transparent border-none outline-none font-bold text-slate-900 cursor-pointer"
-            >
-              <option value="">All Properties (সব প্রোপার্টি)</option>
-              {properties.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </div>
-
+        <div className="flex items-center gap-2">
+          {/* Petty Cash Entry Button (Triggers Modal) */}
           <button 
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => setShowAddForm(true)}
             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
@@ -122,182 +122,201 @@ export default function Accounting({ companyId }: { companyId: string }) {
         </div>
       </div>
 
+      {/* Global Fiscal Cycle Filter Component */}
+      <FiscalCycleFilter
+        state={fiscalState}
+        onChange={setFiscalState}
+        properties={properties}
+        showPropertySelector={true}
+      />
+
+      {/* MODAL DIALOG: Add Petty Cash Transaction */}
       {showAddForm && (
-        <form onSubmit={handleCreateTx} className="bg-white/95 rounded-2xl p-6 border border-slate-200/80 shadow-xl shadow-indigo-950/5 grid grid-cols-1 md:grid-cols-3 gap-5 animate-slide-in border-t-4 border-t-indigo-500">
-          <div className="md:col-span-3 flex justify-between items-center border-b border-slate-100 pb-3">
-            <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-              Add Petty Cash Transaction (নতুন ক্যাশ লেনদেন)
-            </h3>
-            <button 
-              type="button" 
-              onClick={() => setShowAddForm(false)} 
-              className="text-slate-400 hover:text-slate-600 text-xs font-semibold cursor-pointer"
-            >
-              Cancel
-            </button>
-          </div>
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-3xl w-full border border-slate-200 shadow-2xl space-y-5 my-8 relative">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+              <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-indigo-500"></span>
+                Add Petty Cash Transaction (নতুন ক্যাশ লেনদেন)
+              </h3>
+              <button 
+                type="button" 
+                onClick={() => setShowAddForm(false)} 
+                className="p-1.5 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-slate-600 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-          {/* Property Selector */}
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 block mb-1">Property (প্রোপার্টি) *</label>
-            <select
-              value={propertyId}
-              onChange={(e) => setPropertyId(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-              required
-            >
-              {properties.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </div>
+            <form onSubmit={handleCreateTx} className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              {/* Property Selector */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Property (প্রোপার্টি) *</label>
+                <select
+                  value={propertyId}
+                  onChange={(e) => setPropertyId(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium"
+                  required
+                >
+                  {properties.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
 
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 block mb-1">Transaction Type</label>
-            <select
-              value={txType}
-              onChange={(e: any) => {
-                setTxType(e.target.value);
-                setCategory(e.target.value === 'income' ? 'Rent Revenue' : 'Salary Expense');
-              }}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-            >
-              <option value="income">Debit - Cash Inflow (আয়)</option>
-              <option value="expense">Credit - Cash Outflow (ব্যয়)</option>
-            </select>
-          </div>
+              {/* Transaction Type */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Transaction Type</label>
+                <select
+                  value={txType}
+                  onChange={(e: any) => {
+                    setTxType(e.target.value);
+                    setCategory(e.target.value === 'income' ? 'Rent Revenue' : 'Salary Expense');
+                  }}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium"
+                >
+                  <option value="income">Debit - Cash Inflow (আয়)</option>
+                  <option value="expense">Credit - Cash Outflow (ব্যয়)</option>
+                </select>
+              </div>
 
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 block mb-1">Accounting Ledger Code</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-            >
-              {txType === 'income' ? (
-                <>
-                  <option value="Rent Revenue">Rent Revenue (ভাড়া বাবদ আয়)</option>
-                  <option value="Booking Revenue">Booking Revenue (বুকিং বাবদ আয়)</option>
-                  <option value="Other Income">Other Income (অন্যান্য আয়)</option>
-                </>
-              ) : (
-                <>
-                  <option value="Salary Expense">Salary Expense (কর্মচারী বেতন)</option>
-                  <option value="Maintenance Cost">Maintenance Cost (রক্ষণাবেক্ষণ ব্যয়)</option>
-                  <option value="Utility Expense">Utility Expense (ইউটিলিটি বিল)</option>
-                  <option value="Office Rent">Office Rent / General Expense</option>
-                </>
-              )}
-            </select>
-          </div>
+              {/* Ledger Code */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Accounting Ledger Code</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium"
+                >
+                  {txType === 'income' ? (
+                    <>
+                      <option value="Rent Revenue">Rent Revenue (ভাড়া বাবদ আয়)</option>
+                      <option value="Booking Revenue">Booking Revenue (বুকিং বাবদ আয়)</option>
+                      <option value="Other Income">Other Income (অন্যান্য আয়)</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="Salary Expense">Salary Expense (কর্মচারী বেতন)</option>
+                      <option value="Maintenance Cost">Maintenance Cost (রক্ষণাবেক্ষণ ব্যয়)</option>
+                      <option value="Utility Expense">Utility Expense (ইউটিলিটি বিল)</option>
+                      <option value="Office Rent">Office Rent / General Expense</option>
+                    </>
+                  )}
+                </select>
+              </div>
 
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 block mb-1">Payment Channel</label>
-            <select
-              value={account}
-              onChange={(e) => setAccount(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-            >
-              <option value="Cashbook">Petty Cashbook (নগদ ক্যাশ)</option>
-              <option value="Bank Account">Bank Current Account (ব্যাংক হিসাব)</option>
-              <option value="bKash Merchant">bKash Wallet Merchant</option>
-              <option value="Nagad Merchant">Nagad Wallet Merchant</option>
-            </select>
-          </div>
+              {/* Payment Channel */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Payment Channel</label>
+                <select
+                  value={account}
+                  onChange={(e) => setAccount(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium"
+                >
+                  <option value="Cashbook">Petty Cashbook (নগদ ক্যাশ)</option>
+                  <option value="Bank Account">Bank Current Account (ব্যাংক হিসাব)</option>
+                  <option value="bKash Merchant">bKash Wallet Merchant</option>
+                  <option value="Nagad Merchant">Nagad Wallet Merchant</option>
+                </select>
+              </div>
 
-          {/* Date Picker */}
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 block mb-1 flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" />
-              Date (তারিখ) *
-            </label>
-            <input 
-              type="date" 
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-              required
-            />
-          </div>
+              {/* Date */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  Date (তারিখ) *
+                </label>
+                <input 
+                  type="date" 
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium"
+                  required
+                />
+              </div>
 
-          {/* Invoice No */}
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 block mb-1 flex items-center gap-1">
-              <FileText className="w-3.5 h-3.5 text-slate-400" />
-              Invoice / Memo No (ইনভয়েস নং)
-            </label>
-            <input 
-              type="text" 
-              placeholder="e.g. INV-2026-001"
-              value={invoiceNo}
-              onChange={(e) => setInvoiceNo(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-            />
-          </div>
+              {/* Invoice No */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1 flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5 text-slate-400" />
+                  Invoice / Memo No (ইনভয়েস নং)
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. INV-2026-001"
+                  value={invoiceNo}
+                  onChange={(e) => setInvoiceNo(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium"
+                />
+              </div>
 
-          <div>
-            <label className="text-[11px] font-bold text-slate-600 block mb-1">Transaction Value (BDT) *</label>
-            <input 
-              type="number" 
-              placeholder="e.g. 1500"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-              required
-            />
-          </div>
+              {/* Amount */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Transaction Value (BDT) *</label>
+                <input 
+                  type="number" 
+                  placeholder="e.g. 1500"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium"
+                  required
+                />
+              </div>
 
-          <div className="md:col-span-2">
-            <label className="text-[11px] font-bold text-slate-600 block mb-1">Memo Narration *</label>
-            <input 
-              type="text" 
-              placeholder="e.g. অফিস পেপার ও চা নাস্তা ক্রয়"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-              required
-            />
-          </div>
+              {/* Narration Description */}
+              <div className="md:col-span-2">
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Memo Narration *</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. অফিস পেপার ও চা নাস্তা ক্রয়"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium"
+                  required
+                />
+              </div>
 
-          {/* Note Field */}
-          <div className="md:col-span-3">
-            <label className="text-[11px] font-bold text-slate-600 block mb-1 flex items-center gap-1">
-              <Clipboard className="w-3.5 h-3.5 text-slate-400" />
-              Note / Comments (অতিরিক্ত মন্তব্য)
-            </label>
-            <textarea 
-              placeholder="Enter details or comments about this transaction..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium resize-none"
-            />
-          </div>
+              {/* Note / Comments */}
+              <div className="md:col-span-3">
+                <label className="text-[11px] font-bold text-slate-600 block mb-1 flex items-center gap-1">
+                  <Clipboard className="w-3.5 h-3.5 text-slate-400" />
+                  Note / Comments (অতিরিক্ত মন্তব্য)
+                </label>
+                <textarea 
+                  placeholder="Enter details or comments about this transaction..."
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={2}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 outline-none focus:border-indigo-500 font-medium resize-none"
+                />
+              </div>
 
-          <div className="md:col-span-3 flex justify-end gap-2 border-t border-slate-100 pt-3">
-            <button 
-              type="button" 
-              onClick={() => setShowAddForm(false)} 
-              className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-bold transition-all cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit"
-              className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-600/15 hover:shadow-lg transition-all cursor-pointer"
-            >
-              Record Journal Double Entry
-            </button>
+              {/* Form Action Buttons */}
+              <div className="md:col-span-3 flex justify-end gap-2 border-t border-slate-100 pt-4 mt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddForm(false)} 
+                  className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-600/15 hover:shadow-lg transition-all cursor-pointer"
+                >
+                  Record Journal Double Entry
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       )}
 
-      {/* Financial Statement Summaries (Profit & Loss / Cash Flow) */}
+      {/* Financial Summaries Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200 flex items-center justify-between">
           <div>
-            <span className="text-xs text-slate-400 font-semibold block">Total Revenue</span>
+            <span className="text-xs text-slate-400 font-semibold block">Total Revenue (মোট আয়)</span>
             <p className="text-xl font-black text-emerald-500">৳ {revenue.toLocaleString()}</p>
           </div>
           <div className="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl">
@@ -305,9 +324,9 @@ export default function Accounting({ companyId }: { companyId: string }) {
           </div>
         </div>
 
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200 flex items-center justify-between">
           <div>
-            <span className="text-xs text-slate-400 font-semibold block">Total Expenses</span>
+            <span className="text-xs text-slate-400 font-semibold block">Total Expenses (মোট ব্যয়)</span>
             <p className="text-xl font-black text-rose-500">৳ {expense.toLocaleString()}</p>
           </div>
           <div className="p-3 bg-rose-500/10 text-rose-400 rounded-xl">
@@ -315,10 +334,10 @@ export default function Accounting({ companyId }: { companyId: string }) {
           </div>
         </div>
 
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200 flex items-center justify-between">
           <div>
-            <span className="text-xs text-slate-400 font-semibold block">Net Operating Profit</span>
-            <p className="text-xl font-black text-indigo-500 dark:text-indigo-400">৳ {profit.toLocaleString()}</p>
+            <span className="text-xs text-slate-400 font-semibold block">Net Operating Profit (নিট ব্যালেন্স)</span>
+            <p className="text-xl font-black text-indigo-500">৳ {profit.toLocaleString()}</p>
           </div>
           <div className="p-3 bg-indigo-500/10 text-indigo-500 rounded-xl">
             <Landmark className="w-5 h-5" />
@@ -326,67 +345,149 @@ export default function Accounting({ companyId }: { companyId: string }) {
         </div>
       </div>
 
+      {/* Mobile Device Tab Switcher (< md screen size) */}
+      <div className="flex md:hidden bg-slate-200 p-1 rounded-xl">
+        <button
+          onClick={() => setMobileTab('income')}
+          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
+            mobileTab === 'income'
+              ? 'bg-emerald-500 text-white shadow-md'
+              : 'text-slate-600 '
+          }`}
+        >
+          আয় তালিকা ({incomeTxs.length})
+        </button>
+        <button
+          onClick={() => setMobileTab('expense')}
+          className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
+            mobileTab === 'expense'
+              ? 'bg-rose-500 text-white shadow-md'
+              : 'text-slate-600 '
+          }`}
+        >
+          ব্যয় তালিকা ({expenseTxs.length})
+        </button>
+      </div>
+
+      {/* Ledgers & Chart of Accounts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Cashbook Ledger list */}
-        <div className="lg:col-span-2 glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 space-y-4">
-          <span className="font-bold text-sm block">Journal Book ledger</span>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-blue-950/40 text-slate-400">
-                  <th className="py-2.5 font-medium">Date</th>
-                  <th className="py-2.5 font-medium">Property / Ledger</th>
-                  <th className="py-2.5 font-medium font-bold text-slate-500">Invoice No</th>
-                  <th className="py-2.5 font-medium">Narration Description</th>
-                  <th className="py-2.5 text-right font-medium">Value</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-blue-950/30">
-                {filteredTxs.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="py-6 text-center text-slate-400">No transactions recorded for this selection.</td>
-                  </tr>
-                ) : (
-                  filteredTxs.map((t) => (
-                    <tr key={t.id} className="hover:bg-slate-50/50 dark:hover:bg-blue-950/10">
-                      <td className="py-3 text-slate-400">{t.date}</td>
-                      <td className="py-3 font-semibold">
-                        <span className="text-xs block text-slate-800 dark:text-slate-200">{getPropertyName(t.propertyId)}</span>
-                        <span className="text-[10px] text-slate-500 block font-normal">{t.category} via {t.account}</span>
-                      </td>
-                      <td className="py-3 text-slate-500 font-semibold">{t.invoiceNo || '-'}</td>
-                      <td className="py-3 text-slate-400">
-                        <div>{t.description}</div>
-                        {t.note && <div className="text-[10px] text-slate-500 italic mt-0.5">Note: {t.note}</div>}
-                      </td>
-                      <td className={`py-3 text-right font-bold ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                        {t.type === 'income' ? '+' : '-'} ৳{t.amount.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+
+        {/* 1. Income Ledger */}
+        <div className={`glass-panel rounded-2xl p-5 border border-slate-200  ${
+          mobileTab !== 'income' ? 'hidden md:block' : ''
+        }`}>
+          <div className="flex justify-between items-center mb-4">
+            <span className="font-bold text-sm flex items-center gap-2 text-emerald-500">
+              <ArrowUpRight className="w-4 h-4" />
+              Income Ledger (আয় তালিকা)
+            </span>
+            <span className="text-xs bg-emerald-500/10 text-emerald-500 font-bold px-2.5 py-1 rounded-full">
+              {incomeTxs.length} Record(s)
+            </span>
+          </div>
+
+          <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
+            {incomeTxs.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-xs font-medium">
+                নির্বাচিত সাইকেলে কোনো আয়ের লেনদেন নেই।
+              </div>
+            ) : (
+              incomeTxs.map(tx => (
+                <div key={tx.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-emerald-500/30 transition-all space-y-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="font-bold text-slate-800 block text-xs">{tx.description}</span>
+                      <span className="text-[10px] text-emerald-600 font-semibold">{tx.category} • {tx.account}</span>
+                    </div>
+                    <span className="font-black text-emerald-500 text-xs">+৳ {tx.amount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] text-slate-600 pt-1 border-t border-slate-100">
+                    <span>{getPropertyName(tx.propertyId)}</span>
+                    <div className="flex items-center gap-2">
+                      <span>{tx.date}</span>
+                      <button 
+                        onClick={() => handleDeleteTx(tx.id)}
+                        className="text-slate-400 hover:text-rose-500 transition-colors p-0.5"
+                        title="Delete entry"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Trial Balance Chart of Accounts ledger overview */}
-        <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30 space-y-4">
-          <span className="font-bold text-sm block">Chart of Accounts Trial Balance</span>
-          
-          <div className="space-y-3.5">
-            {Object.keys(accountsMap).length === 0 ? (
-              <p className="text-xs text-slate-400 py-2">No accounts data.</p>
+        {/* 2. Expense Ledger */}
+        <div className={`glass-panel rounded-2xl p-5 border border-slate-200  ${
+          mobileTab !== 'expense' ? 'hidden md:block' : ''
+        }`}>
+          <div className="flex justify-between items-center mb-4">
+            <span className="font-bold text-sm flex items-center gap-2 text-rose-400">
+              <ArrowDownRight className="w-4 h-4" />
+              Expense Ledger (ব্যয় তালিকা)
+            </span>
+            <span className="text-xs bg-rose-500/10 text-rose-400 font-bold px-2.5 py-1 rounded-full">
+              {expenseTxs.length} Record(s)
+            </span>
+          </div>
+
+          <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
+            {expenseTxs.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-xs font-medium">
+                নির্বাচিত সাইকেলে কোনো ব্যয়ের লেনদেন নেই।
+              </div>
             ) : (
-              Object.entries(accountsMap).map(([accountName, bal]) => (
-                <div key={accountName} className="flex justify-between items-center text-xs pb-2 border-b border-slate-100 dark:border-blue-950/30">
-                  <div>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">{accountName}</span>
-                    <p className="text-[9px] text-slate-500">General Ledger Account</p>
+              expenseTxs.map(tx => (
+                <div key={tx.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl hover:border-rose-500/30 transition-all space-y-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="font-bold text-slate-800 block text-xs">{tx.description}</span>
+                      <span className="text-[10px] text-rose-500 font-semibold">{tx.category} • {tx.account}</span>
+                    </div>
+                    <span className="font-black text-rose-500 text-xs">-৳ {tx.amount.toLocaleString()}</span>
                   </div>
-                  <span className={`font-bold ${bal >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    ৳ {bal.toLocaleString()}
+                  <div className="flex justify-between items-center text-[10px] text-slate-600 pt-1 border-t border-slate-100">
+                    <span>{getPropertyName(tx.propertyId)}</span>
+                    <div className="flex items-center gap-2">
+                      <span>{tx.date}</span>
+                      <button 
+                        onClick={() => handleDeleteTx(tx.id)}
+                        className="text-slate-400 hover:text-rose-500 transition-colors p-0.5"
+                        title="Delete entry"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* 3. Trial Balance & Chart of Accounts Summary */}
+        <div className="glass-panel rounded-2xl p-5 border border-slate-200">
+          <div className="flex justify-between items-center mb-4">
+            <span className="font-bold text-sm flex items-center gap-2 text-indigo-500">
+              <Landmark className="w-4 h-4" />
+              Trial Balance Cards (হিসাব বিবরণী)
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {Object.keys(accountsMap).length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-xs font-medium">
+                কোনো হিসাব কোড ডাটা নেই।
+              </div>
+            ) : (
+              Object.entries(accountsMap).map(([accName, val]) => (
+                <div key={accName} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center">
+                  <span className="font-semibold text-xs text-slate-700">{accName}</span>
+                  <span className={`font-extrabold text-xs ${val >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    ৳ {Math.abs(val).toLocaleString()} {val >= 0 ? '(Cr)' : '(Dr)'}
                   </span>
                 </div>
               ))
@@ -395,7 +496,6 @@ export default function Accounting({ companyId }: { companyId: string }) {
         </div>
 
       </div>
-
     </div>
   );
 }

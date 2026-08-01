@@ -37,7 +37,7 @@ export default function SuperAdmin() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Active Companies & Subscriptions */}
-        <div className="lg:col-span-2 glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+        <div className="lg:col-span-2 glass-panel rounded-2xl p-5 border border-slate-200">
           <div className="flex justify-between items-center mb-4">
             <span className="font-bold text-sm flex items-center gap-2">
               <Layers className="w-4 h-4 text-purple-400" />
@@ -49,7 +49,7 @@ export default function SuperAdmin() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-blue-950/40 text-slate-400">
+                <tr className="border-b border-slate-200 text-slate-400">
                   <th className="py-2 font-medium">Tenant Name</th>
                   <th className="py-2 font-medium">SaaS Package</th>
                   <th className="py-2 font-medium">Expiry Date</th>
@@ -57,9 +57,9 @@ export default function SuperAdmin() {
                   <th className="py-2 text-right font-medium">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-blue-950/30">
+              <tbody className="divide-y divide-slate-100">
                 {companies.map((c) => (
-                  <tr key={c.id} className="hover:bg-slate-50/50 dark:hover:bg-blue-950/10">
+                  <tr key={c.id} className="hover:bg-slate-50/50">
                     <td className="py-3 font-semibold text-slate-300">{c.name}</td>
                     <td className="py-3">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
@@ -100,20 +100,20 @@ export default function SuperAdmin() {
         <div className="space-y-6">
           
           {/* SMS / WhatsApp Credit Panel */}
-          <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+          <div className="glass-panel rounded-2xl p-5 border border-slate-200">
             <span className="font-bold text-sm flex items-center gap-2 mb-3 text-sky-400">
               <MessageSquare className="w-4 h-4" />
               Communication Credits
             </span>
             <div className="space-y-3">
-              <div className="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-900/40 rounded-xl">
+              <div className="flex justify-between items-center p-2.5 bg-slate-100 rounded-xl">
                 <div>
                   <span className="text-xs text-slate-400">Global SMS Credit Pool</span>
                   <p className="text-lg font-bold text-slate-300">42,500 <span className="text-xs text-slate-500">units</span></p>
                 </div>
                 <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full">Healthy</span>
               </div>
-              <div className="flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-900/40 rounded-xl">
+              <div className="flex justify-between items-center p-2.5 bg-slate-100 rounded-xl">
                 <div>
                   <span className="text-xs text-slate-400">WhatsApp Gateway Credits</span>
                   <p className="text-lg font-bold text-slate-300">8,900 <span className="text-xs text-slate-500">units</span></p>
@@ -124,7 +124,7 @@ export default function SuperAdmin() {
           </div>
 
           {/* Feature Control Toggles */}
-          <div className="glass-panel rounded-2xl p-5 border border-slate-200 dark:border-blue-900/30">
+          <div className="glass-panel rounded-2xl p-5 border border-slate-200">
             <span className="font-bold text-sm flex items-center gap-2 mb-4 text-purple-400">
               <Sliders className="w-4 h-4" />
               Global Feature Toggles
