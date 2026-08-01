@@ -389,7 +389,7 @@ export default function Accounting({ companyId }: { companyId: string }) {
           <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
             {incomeTxs.length === 0 ? (
               <div className="p-8 text-center text-slate-400 text-xs font-medium">
-                নির্বাচিত সাইকেলে কোনো আয়ের লেনদেন নেই।
+                নির্বাচিত মাসে কোনো আয়ের লেনদেন নেই।
               </div>
             ) : (
               incomeTxs.map(tx => (
@@ -437,7 +437,7 @@ export default function Accounting({ companyId }: { companyId: string }) {
           <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
             {expenseTxs.length === 0 ? (
               <div className="p-8 text-center text-slate-400 text-xs font-medium">
-                নির্বাচিত সাইকেলে কোনো ব্যয়ের লেনদেন নেই।
+                নির্বাচিত মাসে কোনো ব্যয়ের লেনদেন নেই।
               </div>
             ) : (
               expenseTxs.map(tx => (

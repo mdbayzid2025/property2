@@ -5,7 +5,7 @@ export type Language = 'bn' | 'en';
 const translations = {
   bn: {
     // Brand & Meta
-    appName: 'বঙ্গ প্রপার্টি ইআরপি',
+    appName: 'মহিউদ্দিন প্রপার্টি ইআরপি',
     footerMadeBy: 'মেড বাই সফটওয়্যার পয়েন্ট',
     hotline: 'হটলাইন: ০১৭২৪-৫৬১৬৭০',
     slogan: 'আধুনিক প্রপার্টি ম্যানেজমেন্ট সফটওয়্যার',
@@ -23,7 +23,7 @@ const translations = {
     employeeMgmt: 'কর্মচারী তালিকা',
     salesBooking: 'সেলস ও বুকিং',
     installmentMgmt: 'কিস্তি ট্র্যাকিং',
-    accountingSystem: 'হিসাববিজ্ঞান',
+    accountingSystem: 'আয়-ব্যায় ম্যানেজ',
     crmModule: 'গ্রাহক সিআরএম',
     documentMgmt: 'ডকুমেন্টস',
     noticeBoard: 'নোটিশ বোর্ড',
@@ -213,10 +213,10 @@ const translations = {
   },
   en: {
     // Brand & Meta
-    appName: 'Bongo Property ERP',
+    appName: 'Mohoudin Property ERP',
     footerMadeBy: 'Made by Software Point',
     hotline: 'Hotline: 01724-561670',
-    slogan: 'Modern Property Management ERP',
+    slogan: 'Mohoudin Property ERP',
 
     // Sidebar / Navigation
     dashboard: 'Dashboard',
@@ -423,30 +423,30 @@ const translations = {
 
 export function useTranslation() {
   const [lang, setLang] = useState<Language>(() => {
-    const saved = localStorage.getItem('bongo_erp_lang');
+    const saved = localStorage.getItem('mohoudin_erp_lang');
     return (saved === 'en' || saved === 'bn') ? (saved as Language) : 'bn'; // Default Bangla
   });
 
   useEffect(() => {
     const handleLangChange = () => {
-      const saved = localStorage.getItem('bongo_erp_lang');
+      const saved = localStorage.getItem('mohoudin_erp_lang');
       if (saved === 'en' || saved === 'bn') {
         setLang(saved as Language);
       }
     };
     window.addEventListener('storage', handleLangChange);
-    window.addEventListener('bongo_lang_change', handleLangChange);
+    window.addEventListener('mohoudin_lang_change', handleLangChange);
     return () => {
       window.removeEventListener('storage', handleLangChange);
-      window.removeEventListener('bongo_lang_change', handleLangChange);
+      window.removeEventListener('mohoudin_lang_change', handleLangChange);
     };
   }, []);
 
   const toggleLanguage = () => {
     const nextLang = lang === 'bn' ? 'en' : 'bn';
     setLang(nextLang);
-    localStorage.setItem('bongo_erp_lang', nextLang);
-    window.dispatchEvent(new Event('bongo_lang_change'));
+    localStorage.setItem('mohoudin_erp_lang', nextLang);
+    window.dispatchEvent(new Event('mohoudin_lang_change'));
   };
 
   const t = (key: keyof typeof translations['en']): string => {

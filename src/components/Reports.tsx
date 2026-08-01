@@ -558,7 +558,7 @@ export default function Reports({ companyId }: { companyId: string }) {
       <div className="no-print grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 block uppercase">সাইকেলের মোট আয় (Revenue)</span>
+            <span className="text-[11px] font-bold text-slate-400 block uppercase">মাসিক মোট আয় (Revenue)</span>
             <span className="text-lg font-black text-emerald-500">{formatCurrency(summaryGrandTotalIncome, lang)}</span>
           </div>
           <TrendingUp className="w-5 h-5 text-emerald-500" />
@@ -588,7 +588,7 @@ export default function Reports({ companyId }: { companyId: string }) {
           {/* Header Title Banner */}
           <div className="text-center border-b-2 border-slate-800 pb-4 space-y-1">
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-wide uppercase">
-              {lang === 'bn' ? 'আলিফ টাওয়ার ও অন্যান্য প্রতিষ্ঠানের আয় ও ব্যায়ের হিসাব' : 'ALIF TOWER & ASSOCIATES CONSOLIDATED PROFIT & LOSS'}
+              {lang === 'bn' ? 'আলিফ টাওয়ার-১ ও অন্যান্য প্রতিষ্ঠানের আয় ও ব্যায়ের হিসাব' : 'ALIF TOWER-1 & ASSOCIATES CONSOLIDATED PROFIT & LOSS'}
             </h1>
             <p className="text-sm font-extrabold text-slate-700">
               {lang === 'bn' ? 'পরিক্রমণ সময়কাল: ' : 'Reporting Period: '}

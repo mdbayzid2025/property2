@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../services/translation';
 import { MockDB, Unit, Property, Tenant, Invoice } from '../services/db';
-import { FiscalCycleState, DEFAULT_FISCAL_CYCLE } from '../services/fiscalCycle';
+import { FiscalCycleState, DEFAULT_FISCAL_CYCLE, MONTH_NAMES_EN, MONTH_NAMES_BN } from '../services/fiscalCycle';
 import { filterRecordsByFiscalCycle } from '../services/mongoQueryHelper';
 import FiscalCycleFilter from './FiscalCycleFilter';
 import { Zap, Plus, Trash2, Calendar, User, ShieldCheck, X } from 'lucide-react';
@@ -25,7 +25,14 @@ export default function UtilityManager({ companyId }: { companyId: string }) {
   // Form State Modal
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedUnitId, setSelectedUnitId] = useState('');
-  const [billingMonth, setBillingMonth] = useState('July 2026');
+
+  const now = new Date();
+  const currentMonthName = MONTH_NAMES_EN[now.getMonth()] || 'July';
+  const currentYearVal = now.getFullYear();
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(currentMonthName);
+  const [selectedYear, setSelectedYear] = useState<number>(currentYearVal);
+  const billingMonth = `${selectedMonth} ${selectedYear}`;
 
   // Electricity
   const [elecPrev, setElecPrev] = useState('');
@@ -290,14 +297,36 @@ export default function UtilityManager({ companyId }: { companyId: string }) {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">বিলিং সাইকেল / মাস *</label>
-                  <input
-                    type="text"
-                    value={billingMonth}
-                    onChange={e => setBillingMonth(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 outline-none focus:border-sky-500 font-semibold"
-                    required
-                  />
+                  <label className="text-xs font-bold text-slate-700 block mb-1">মাসিক বিলিং পিরিয়ড *</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* 1st Select: Month */}
+                    <select
+                      value={selectedMonth}
+                      onChange={e => setSelectedMonth(e.target.value)}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 outline-none focus:border-sky-500 font-semibold cursor-pointer text-xs"
+                      required
+                    >
+                      {MONTH_NAMES_EN.map((m, idx) => (
+                        <option key={m} value={m}>
+                          {lang === 'bn' ? MONTH_NAMES_BN[idx] : m}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* 2nd Select: Year */}
+                    <select
+                      value={selectedYear}
+                      onChange={e => setSelectedYear(Number(e.target.value))}
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 outline-none focus:border-sky-500 font-semibold cursor-pointer text-xs"
+                      required
+                    >
+                      {[2024, 2025, 2026, 2027, 2028, 2029, 2030].map(y => (
+                        <option key={y} value={y}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -456,7 +485,7 @@ export default function UtilityManager({ companyId }: { companyId: string }) {
         <div className="flex justify-between items-center">
           <span className="font-bold text-sm">ইউটিলিটি ও বিলিং বিবরণী</span>
           <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
-            সাইকেলের মোট ইউটিলিটি: ৳ {totalUtilityCost.toLocaleString()}
+            মাসিক মোট ইউটিলিটি: ৳ {totalUtilityCost.toLocaleString()}
           </span>
         </div>
 
@@ -465,7 +494,7 @@ export default function UtilityManager({ companyId }: { companyId: string }) {
             <thead>
               <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                 <th className="p-3">ফ্ল্যাট / ইউনিট</th>
-                <th className="p-3">সাইকেল / মাস</th>
+                <th className="p-3">মাস</th>
                 <th className="p-3">বিদ্যুৎ বিল</th>
                 <th className="p-3">গ্যাস বিল</th>
                 <th className="p-3">পানি ও গ্যারেজ</th>
@@ -477,7 +506,7 @@ export default function UtilityManager({ companyId }: { companyId: string }) {
               {filteredUtilities.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-8 text-center text-slate-400">
-                    নির্বাচিত সাইকেলে কোনো ইউটিলিটি বিলিং তথ্য নেই।
+                    নির্বাচিত মাসে কোনো ইউটিলিটি বিলিং তথ্য নেই।
                   </td>
                 </tr>
               ) : (

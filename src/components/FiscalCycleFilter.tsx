@@ -64,10 +64,10 @@ export default function FiscalCycleFilter({
           <div>
             <div className="flex items-center gap-2">
               <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                {lang === 'bn' ? 'অর্থবছর ও বিলিং সাইকেল ফিল্টার' : 'Fiscal & Billing Cycle Filter'}
+                {lang === 'bn' ? 'অর্থবছর ও মাস ফিল্টার' : 'Fiscal & Monthly Filter'}
               </h4>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
-                {state.mode === 'monthly' ? (lang === 'bn' ? 'মাসিক (১২ সাইকেল)' : 'Monthly (12 Cycles)') : (lang === 'bn' ? 'ত্রৈমাসিক (৪ সাইকেল)' : 'Quarterly (4 Cycles)')}
+                {lang === 'bn' ? 'মাসিক হিসাব' : 'Monthly Accounting'}
               </span>
             </div>
             <p className="text-[11px] font-semibold text-slate-500 mt-0.5 flex items-center gap-1">
@@ -96,7 +96,7 @@ export default function FiscalCycleFilter({
 
       {/* Filter Controls Row */}
       {!state.isCustomRange ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1 border-t border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1 border-t border-slate-100">
           
           {/* 1. Fiscal Year Selector */}
           <div className="flex flex-col">
@@ -117,78 +117,30 @@ export default function FiscalCycleFilter({
             </select>
           </div>
 
-          {/* 2. Cycle Mode Switcher */}
-          <div className="flex flex-col">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">
-              <Layers className="w-3 h-3 text-purple-500" />
-              {lang === 'bn' ? 'সাইকেল মোড (Cycle Mode)' : 'Cycle Mode'}
-            </label>
-            <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200">
-              <button
-                type="button"
-                onClick={() => handleModeChange('monthly')}
-                className={`py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                  state.mode === 'monthly'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-600  hover:text-slate-900 '
-                }`}
-              >
-                {lang === 'bn' ? 'মাসিক (12)' : 'Monthly (12)'}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleModeChange('quarterly')}
-                className={`py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                  state.mode === 'quarterly'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-600  hover:text-slate-900 '
-                }`}
-              >
-                {lang === 'bn' ? 'ত্রৈমাসিক (4)' : 'Quarterly (4)'}
-              </button>
-            </div>
-          </div>
-
-          {/* 3. Period Selector (Dynamic: Monthly vs Quarterly) */}
+          {/* 2. Month Selector */}
           <div className="flex flex-col">
             <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">
               <Clock className="w-3 h-3 text-teal-500" />
-              {state.mode === 'monthly' 
-                ? (lang === 'bn' ? 'মাস নির্বাচন (Select Month)' : 'Select Month')
-                : (lang === 'bn' ? 'কোয়ার্টার নির্বাচন (Select Quarter)' : 'Select Quarter')
-              }
+              {lang === 'bn' ? 'মাস নির্বাচন (Select Month)' : 'Select Month'}
             </label>
             <select
               value={state.period}
               onChange={(e) => handlePeriodChange(e.target.value)}
               className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-indigo-500 cursor-pointer"
             >
-              {state.mode === 'monthly' ? (
-                <>
-                  <option value="all">{lang === 'bn' ? 'সব মাস (পুরো বছর - ১২ মাস)' : 'All Months (Entire Year)'}</option>
-                  {MONTH_NAMES_BN.map((bnName, idx) => {
-                    const monthVal = (idx + 1).toString();
-                    return (
-                      <option key={monthVal} value={monthVal}>
-                        {lang === 'bn' ? `${bnName} (${state.year})` : `${MONTH_NAMES_BN[idx]} / ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][idx]} (${state.year})`}
-                      </option>
-                    );
-                  })}
-                </>
-              ) : (
-                <>
-                  <option value="all">{lang === 'bn' ? 'সব কোয়ার্টার (Q1 - Q4)' : 'All Quarters (Q1 - Q4)'}</option>
-                  {(Object.keys(QUARTERS_INFO) as QuarterId[]).map((qId) => (
-                    <option key={qId} value={qId}>
-                      {lang === 'bn' ? QUARTERS_INFO[qId].labelBn : QUARTERS_INFO[qId].labelEn} ({state.year})
-                    </option>
-                  ))}
-                </>
-              )}
+              <option value="all">{lang === 'bn' ? 'সব মাস (পুরো বছর - ১২ মাস)' : 'All Months (Entire Year)'}</option>
+              {MONTH_NAMES_BN.map((bnName, idx) => {
+                const monthVal = (idx + 1).toString();
+                return (
+                  <option key={monthVal} value={monthVal}>
+                    {lang === 'bn' ? `${bnName} (${state.year})` : `${MONTH_NAMES_BN[idx]} / ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][idx]} (${state.year})`}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
-          {/* 4. Property Selector */}
+          {/* 3. Property Selector */}
           {showPropertySelector && (
             <div className="flex flex-col">
               <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">

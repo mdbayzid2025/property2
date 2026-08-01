@@ -12,7 +12,7 @@ export default function AIChatSidebar({ isOpen, onClose }: { isOpen: boolean; on
   const { t, lang } = useTranslation();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { sender: 'bot', text: lang === 'bn' ? 'আসসালামু আলাইকুম! আমি বঙ্গ প্রোপার্টি এআই চ্যাট অ্যাসিস্ট্যান্ট। আমি আপনাকে কীভাবে সাহায্য করতে পারি?' : 'Hello! I am the Bongo Property AI Chat Assistant. How can I help you today?' }
+    { sender: 'bot', text: lang === 'bn' ? 'আসসালামু আলাইকুম! আমি মহিউদ্দিন প্রোপার্টি এআই চ্যাট অ্যাসিস্ট্যান্ট। আমি আপনাকে কীভাবে সাহায্য করতে পারি?' : 'Hello! I am the Mohoudin Property AI Chat Assistant. How can I help you today?' }
   ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -73,8 +73,8 @@ export default function AIChatSidebar({ isOpen, onClose }: { isOpen: boolean; on
       }
       else {
         reply = lang === 'bn'
-          ? `আমি বঙ্গ ইআরপি-র ডেটাবেজ বিশ্লেষণ করে হিসাব দিতে পারি। বকেয়া ভাড়া দেখতে 'বকেয়া কত?', আদায় দেখতে 'কালেকশন কত?' অথবা ফাঁকা ফ্ল্যাটের সংখ্যা জানতে 'ফাঁকা ফ্ল্যাট কয়টি?' লিখে প্রশ্ন করুন।`
-          : `I can search Bongo ERP database tables. Try asking: "What is the total due?", "Show collections", or "Who is Kamrul Hasan?".`;
+          ? `আমি মহিউদ্দিন ইআরপি-র ডেটাবেজ বিশ্লেষণ করে হিসাব দিতে পারি। বকেয়া ভাড়া দেখতে 'বকেয়া কত?', আদায় দেখতে 'কালেকশন কত?' অথবা ফাঁকা ফ্ল্যাটের সংখ্যা জানতে 'ফাঁকা ফ্ল্যাট কয়টি?' লিখে প্রশ্ন করুন।`
+          : `I can search Mohoudin ERP database tables. Try asking: "What is the total due?", "Show collections", or "Who is Kamrul Hasan?".`;
       }
 
       setMessages(prev => [...prev, { sender: 'bot', text: reply }]);

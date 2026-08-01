@@ -267,7 +267,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
             <label className="text-xs text-slate-400 block mb-1">Property Name</label>
             <input
               type="text"
-              placeholder="e.g. Bongo Tower Phase-2"
+              placeholder="e.g. Alif Tower-1 Phase-2"
               value={newPropName}
               onChange={(e) => setNewPropName(e.target.value)}
               className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none"
@@ -1141,7 +1141,7 @@ export default function PropertyManager({ companyId }: { companyId: string }) {
 
                   <div className="space-y-3 text-[11px] font-sans">
                     <p>
-                      <strong>১ম পক্ষ (প্রপার্টি মালিক):</strong> বঙ্গ প্রোপার্টি হোল্ডিংস লিমিটেড (ম্যানেজার পক্ষে).
+                      <strong>১ম পক্ষ (প্রপার্টি মালিক):</strong> মহিউদ্দিন প্রোপার্টি হোল্ডিংস লিমিটেড (ম্যানেজার পক্ষে).
                     </p>
                     <p>
                       <strong>২য় পক্ষ (ভাড়াটিয়া):</strong> {viewingDocTenant.name}, মোবাইল: {viewingDocTenant.phone}.
